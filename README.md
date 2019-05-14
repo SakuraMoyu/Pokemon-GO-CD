@@ -10,4 +10,6 @@ At this point a form shall pop up
 
 4. Fill the form and click "Start Calculation!" button at the bottom
 
-The calculation result will shown at the bottom, you can copy the table to excel and do what you want.
+The calculation result will shown at the bottom, you can copy the table to excel and do what you want with the data.
+
+If there is a calculation mistake(bug) please notify me as soon as possible, thank you for your cooperation.
