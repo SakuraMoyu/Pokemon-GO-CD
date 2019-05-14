@@ -259,6 +259,8 @@
    
 </form>
 
+<p id="expected_value" style="visibility:hidden;"/>
+
 <table id="result" style="visibility:hidden;">
 </table>
 
@@ -379,6 +381,17 @@
     var actual_bound = 0;
     
     var result_table = document.getElementById("result");
+    
+    var no_of_combination = 0;
+    var no_of_combination_weather = 0;
+    var no_of_combination_friend = 0;
+    var no_of_combination_lucky = 0;
+    var expected_value = 0;
+    var expected_value_weather = 0;
+    var expected_value_friend = 0;
+    var expected_value_lucky = 0;
+    
+    var expected_value_text = document.getElementById("expected_value");
 
     var fileInput = document.getElementById("csv"),
 
@@ -438,6 +451,17 @@
     }
     
     function calculation() {
+        power_up_cost = [];
+        max_cp = [];
+        actual_bound = 0;
+        no_of_combination = 0;
+        no_of_combination_weather = 0;
+        no_of_combination_friend = 0;
+        no_of_combination_lucky = 0;
+        expected_value = 0;
+        expected_value_weather = 0;
+        expected_value_friend = 0;
+        expected_value_lucky = 0;
         result_table.innerHTML = "";
         pokemon_entry_no = parseInt(species.value);
         var go_base_stat = go_msg_stat_conversion(pokemon_entry_no);
@@ -448,8 +472,40 @@
         table_generation(go_base_stat, cp_iv_hash_map, appraisal_slider.value, 2);
         table_generation(go_base_stat, cp_iv_hash_map, level_slider.value, 3);
         result_table.style.visibility = "visible";
+        expected_value = Math.ceil(4096/no_of_combination);
+        expected_value_weather = Math.ceil(1728/no_of_combination_weather);
+        expected_value_friend = Math.ceil(1331/no_of_combination_friend);
+        expected_value_lucky = Math.ceil(64/no_of_combination_friend);
+        var expected_value_message = "Expected no of catch needed to get one candidate " + pokemon_namelist[pokemon_entry_no] + " without weather boost: " + expected_value + "<br/>";
+        expected_value_message = expected_value_message + "Expected no of catch needed to get one candidate " + pokemon_namelist[pokemon_entry_no] + " with weather boost: " + expected_value_weather + "<br/>";
+        expected_value_message = expected_value_message + "Expected no of trade with best friend to get one candidate " + pokemon_namelist[pokemon_entry_no] + ": " + expected_value_friend + "<br/>";
+        expected_value_message = expected_value_message + "Expected no of lucky trade to get one candidate " + pokemon_namelist[pokemon_entry_no] + ": " + expected_value_lucky + "<br/>";
+        expected_value_text.innerHTML = expected_value_message;
+        expected_value_text.style.visibility = "visible";
         return;
     } 
+    
+    function go_msg_stat_conversion(pokemon_entry_no) {
+        var msg_stat = pokemon_stat_array[pokemon_entry_no];
+        var speedmod = 1+((msg_stat[5]-75)/500);
+        var mixed_attack = Math.round(((Math.max(msg_stat[1], msg_stat[3])*7/8) + (Math.min(msg_stat[1], msg_stat[3])*1/8))*2);
+        var theory_attack = Math.round(mixed_attack*speedmod);
+        var mixed_defense = Math.round(((Math.max(msg_stat[2], msg_stat[4])*5/8) + (Math.min(msg_stat[2], msg_stat[4])*3/8))*2);
+        var theory_defense = Math.round(mixed_defense*speedmod);
+        var theory_hp = Math.floor(50+1.75*msg_stat[0]);
+        var theory_max_cp = Math.floor((theory_attack+15)*Math.sqrt(theory_defense+15)*Math.sqrt(theory_hp+15)*Math.pow(cpm[78],2)/10);
+        //alert([speedmod,mixed_attack, theory_attack,mixed_defense,theory_defense,theory_hp,theory_max_cp]);
+        if (theory_max_cp < 4000) {
+            var go_base_stat = [theory_hp, theory_attack, theory_defense];
+            return go_base_stat;
+        } else {
+            var circle_9_nerf_attack = Math.round(mixed_attack*speedmod*0.91);
+            var circle_9_nerf_defense = Math.round(mixed_defense*speedmod*0.91);
+            var circle_9_nerf_hp = Math.round((50+1.75*msg_stat[0])*0.91);
+            var go_base_stat = [circle_9_nerf_hp, circle_9_nerf_attack, circle_9_nerf_defense];
+            return go_base_stat;
+        }
+    }
     
     function generate_constrain_matrix() {
         var constrain_tensor = [];
@@ -546,36 +602,24 @@
                                 break;                
                         }
                     }
-                    constrain_list[hp] = true;                    
+                    constrain_list[hp] = true;
+                    ++no_of_combination;                      
+                    if ((def >= 4) && (atk >= 4) && (hp >= 4)) {
+                        ++no_of_combination_weather;
+                    }  
+                    if ((def >= 5) && (atk >= 5) && (hp >= 5)) {
+                        ++no_of_combination_friend;
+                    }   
+                    if ((def >= 12) && (atk >= 12) && (hp >= 12)) {
+                        ++no_of_combination_lucky;
+                    }                                                 
                 }
                 constrain_matrix[def] = constrain_list;
             }
             constrain_tensor[atk] = constrain_matrix;
         }
         return constrain_tensor;
-    }
-    
-    function go_msg_stat_conversion(pokemon_entry_no) {
-        var msg_stat = pokemon_stat_array[pokemon_entry_no];
-        var speedmod = 1+((msg_stat[5]-75)/500);
-        var mixed_attack = Math.round(((Math.max(msg_stat[1], msg_stat[3])*7/8) + (Math.min(msg_stat[1], msg_stat[3])*1/8))*2);
-        var theory_attack = Math.round(mixed_attack*speedmod);
-        var mixed_defense = Math.round(((Math.max(msg_stat[2], msg_stat[4])*5/8) + (Math.min(msg_stat[2], msg_stat[4])*3/8))*2);
-        var theory_defense = Math.round(mixed_defense*speedmod);
-        var theory_hp = Math.floor(50+1.75*msg_stat[0]);
-        var theory_max_cp = Math.floor((theory_attack+15)*Math.sqrt(theory_defense+15)*Math.sqrt(theory_hp+15)*Math.pow(cpm[78],2)/10);
-        //alert([speedmod,mixed_attack, theory_attack,mixed_defense,theory_defense,theory_hp,theory_max_cp]);
-        if (theory_max_cp < 4000) {
-            var go_base_stat = [theory_hp, theory_attack, theory_defense];
-            return go_base_stat;
-        } else {
-            var circle_9_nerf_attack = Math.round(mixed_attack*speedmod*0.91);
-            var circle_9_nerf_defense = Math.round(mixed_defense*speedmod*0.91);
-            var circle_9_nerf_hp = Math.round((50+1.75*msg_stat[0])*0.91);
-            var go_base_stat = [circle_9_nerf_hp, circle_9_nerf_attack, circle_9_nerf_defense];
-            return go_base_stat;
-        }
-    }
+    }    
     
     //only put any level,IVs combination which create targeted CP into the map to reduce size
     function go_cp_calculation(go_base_stat, constrains) {
