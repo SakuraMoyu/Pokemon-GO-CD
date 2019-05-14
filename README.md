@@ -10,6 +10,10 @@ At this point a form shall pop up
 
 4. Fill the form and click "Start Calculation!" button at the bottom
 
+Accuracy means the chance that these information will lead to a pokemon with target IV (P(target IV|Informations from CP, etc.)). 
+
+Note that even though the minimum accuracy is set as 0% the calculator will still ignore cases with none of the IV combination meeting the target(thus the accuacy is 0%), the calculator will only shown cases that comprise with at least 1 target IV combination.
+
 The calculation result will shown at the bottom, you can copy the table to excel and do what you want with the data.
 
 You may also click the "Show Compact List" button to get the summarized information of the data.
@@ -17,6 +21,8 @@ You may also click the "Show Compact List" button to get the summarized informat
 Predicted appraisal result is also shown in summarized information.
 
 Try not to set loose constrain on IV or it may not have enough memory to work with......
+
+Result from a sample run of calculator was added as "Torchic Sample Run.xlsx", the configuation is (Atk IV >= 14, Def IV >= 11, Sta IV >= 11 and overall IV >= 40) with all accuracy set as 0%
 
 How to interpret the data generated:
 
