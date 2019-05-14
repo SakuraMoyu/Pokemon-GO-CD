@@ -16,7 +16,7 @@ You may also click the "Show Compact List" button to get the summarized informat
 
 Predicted appraisal result is also shown in summarized information.
 
-
+Try not to set loose constrain on IV or it may not have enough memory to work with......
 
 How to interpret the data generated:
 
