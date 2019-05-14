@@ -785,9 +785,13 @@
                                             checked[crash_forward] = true;
                                             continue;
                                         } else {
-                                            var mode_1_2_check = (check_stat[1] == cp_iv_hash_map[cp][crash][1])&&(check_stat[5] == cp_iv_hash_map[cp][crash][5])&&((mode == 2)||(mode == 1));
-                                            var mode_3_check = (check_stat[0] == cp_iv_hash_map[cp][crash][0])&&(check_stat[5] == cp_iv_hash_map[cp][crash][5])&&(mode == 3);
-                                            if (mode_1_2_check || mode_3_check) {
+                                            var appraisal_crash = appraisal(cp_iv_hash_map[cp][crash][2], cp_iv_hash_map[cp][crash][3], cp_iv_hash_map[cp][crash][4]);
+                                            var appraisal_crash_forward = appraisal(check_stat[2], check_stat[3], check_stat[4]);
+                                            var appraisal_result = (appraisal_crash[0] == appraisal_crash_forward[0])&&(appraisal_crash[1] == appraisal_crash_forward[1])&&(appraisal_crash[2] == appraisal_crash_forward[2])&&(appraisal_crash[3] == appraisal_crash_forward[3]);
+                                            var mode_1_check = (check_stat[1] == cp_iv_hash_map[cp][crash][1])&&(check_stat[5] == cp_iv_hash_map[cp][crash][5])&&(mode == 1);
+                                            var mode_2_check = (check_stat[1] == cp_iv_hash_map[cp][crash][1])&&(check_stat[5] == cp_iv_hash_map[cp][crash][5])&&(appraisal_result)&&(mode == 2);
+                                            var mode_3_check = (check_stat[0] == cp_iv_hash_map[cp][crash][0])&&(check_stat[5] == cp_iv_hash_map[cp][crash][5])&&(appraisal_result)&&(mode == 3);
+                                            if (mode_1_check || mode_2_check || mode_3_check) {
                                                 checked[crash_forward] = true;
                                                 if (check_stat[6]) {
                                                     ++true_positive;
@@ -857,6 +861,30 @@
         }
         generate_summarized_table(candidate_cp, mode);
         return;
+    }
+    
+    function appraisal(atk, def, sta) {
+        var appraisal_result = [false, false, false, -1];
+        var best_stat = Math.max(atk, def, sta)
+        if (atk == best_stat) {
+            appraisal_result[0] = true;
+        }
+        if (def == best_stat) {
+            appraisal_result[1] = true;
+        }      
+        if (sta == best_stat) {
+            appraisal_result[2] = true;
+        }
+        if (best_stat < 8) {
+            appraisal_result[3] = 0;
+        } else if (best_stat < 13) {
+            appraisal_result[3] = 1;
+        } else if (best_stat < 15) {
+            appraisal_result[3] = 2;
+        } else {
+            appraisal_result[3] = 3;
+        }
+        return appraisal_result;
     }
     
     function write_table_header(mode) {
@@ -1339,6 +1367,7 @@
         summarized_result.style.display = "block";
         return;
     }
+    
     
     
 </script>
