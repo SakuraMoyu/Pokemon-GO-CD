@@ -12,9 +12,14 @@ At this point a form shall pop up
 
 The calculation result will shown at the bottom, you can copy the table to excel and do what you want with the data.
 
+
+
 How to interpret the data generated:
 
-Expected value: Show number of action you needed in order to get one of the IV combination you needed, gives you an insight of how much candidate pokemon you will end up with after the spawn and trade.
+
+Expected value: 
+
+Show number of action you needed in order to get one of the IV combination you needed, gives you an insight of how much candidate pokemon you will end up with after the spawn and trade.
 
 Table with CP only:
 
@@ -32,6 +37,10 @@ CP value within 2 power up is also shown as refrence so you can quickly check if
 Table with level:
 
 After all, the most significant ambiguity of the true IV combination of a usual CD pokemon after appraisal comes from level, so with this last pieces of information known in general you can yield 100% accuracy on identifying the pokemon is a target or not. The remaining inaccuracy can be further reduced after detailed appraisal result is implemented.
+
+
 Max CP is given as this table is expected to be used with trading feature. In trading feature, after you have selected a pokemon, a range of CP with shown, checking the upper bound of this range can immediately tell which level your pokemon is. Note that if your friend is too low on trainer level you may not be able to get the correct max cp as the level of your pokemons will be trimmed to match your friend's trainer level. The range of CP has to be white color, instead of orange, in order to show the correct max CP.
+
+
 
 If there is a calculation mistake(bug) please notify me as soon as possible, thank you for your cooperation.
