@@ -1,0 +1,906 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Fast IV Lookup</title>
+  <meta name="description" content="Fast IV Lookup">
+  <meta name="author" content="SakuraMoyu">
+
+  
+
+</head>
+
+<body>
+
+<p id="csv_instruction">Please select pokémon base stat csv file for calculation:</p>
+<input id="csv" type="file">
+
+<br/>
+
+<form id="Query" style="visibility:hidden;">
+    <table>
+        <tr>
+            <th>
+                <p>Pokémon:</p>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <p>Species:</p>
+            </td>
+            <td>
+                <select id="species">
+                    <option value="none">N/A</option>
+                </select>
+            </td>
+        </tr>
+        <br/>
+        <tr>
+            <th>
+                <p>IVs:</p>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <p>Attack IV:</p>
+            </td>
+            <td>
+                <select id="atk_range">
+                    <option value="0">&#62;=</option>
+                    <option value="1">=</option>
+                    <option value="2">&#60;=</option>
+                </select>
+                <select id="atk_iv">
+                    <option selected value="-1">Don't care</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Defense IV:</p>
+            </td>
+            <td>
+                <select id="def_range">
+                    <option value="0">&#62;=</option>
+                    <option value="1">=</option>
+                    <option value="2">&#60;=</option>
+                </select>
+                <select id="def_iv">
+                    <option selected value="-1">Don't care</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Stamina IV:</p>
+            </td>
+            <td>
+                <select id="sta_range">
+                    <option value="0">&#62;=</option>
+                    <option value="1">=</option>
+                    <option value="2">&#60;=</option>
+                </select>
+                <select id="sta_iv">
+                    <option selected value="-1">Don't care</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Total IV:</p>
+            </td>
+            <td>
+                <select id="sum_range">
+                    <option value="0">&#62;=</option>
+                    <option value="1">=</option>
+                    <option value="2">&#60;=</option>
+                </select>
+                <select id="sum_iv">
+                    <option selected value="-1">Don't care</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                    <option value="19">19</option>
+                    <option value="20">20</option>
+                    <option value="21">21</option>
+                    <option value="22">22</option>
+                    <option value="23">23</option>
+                    <option value="24">24</option>
+                    <option value="25">25</option>
+                    <option value="26">26</option>
+                    <option value="27">27</option>
+                    <option value="28">28</option>
+                    <option value="29">29</option>
+                    <option value="30">30</option>
+                    <option value="31">31</option>
+                    <option value="32">32</option>
+                    <option value="33">33</option>
+                    <option value="34">34</option>
+                    <option value="35">35</option>
+                    <option value="36">36</option>
+                    <option value="37">37</option>
+                    <option value="38">38</option>
+                    <option value="39">39</option>
+                    <option value="40">40</option>
+                    <option value="41">41</option>
+                    <option value="42">42</option>
+                    <option value="43">43</option>
+                    <option value="44">44</option>
+                    <option value="45">45</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <p>Accuracy:</p>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <p>Minimum accuracy with CP known:</p> 
+            </th>
+        </tr>
+        <tr>
+            <td>
+                Accuracy: <span id="cp_accuracy_value"></span>%                               
+            </td>
+            <td>
+                <input type="range" min="0" max="100" value="80" class="slider" id="cp_accuracy"> 
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <p>Minimum accuracy with HP and power up dust cost known:</p> 
+            </th>
+        </tr>
+        <tr>
+            <td>
+                Accuracy: <span id="summary_accuracy_value"></span>%                               
+            </td>
+            <td>
+                <input type="range" min="0" max="100" value="80" class="slider" id="summary_accuracy"> 
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <p>Minimum accuracy with appraisal result known:</p> 
+            </th>
+        </tr>
+        <tr>
+            <td>
+                Accuracy: <span id="appraisal_accuracy_value"></span>%                               
+            </td>
+            <td>
+                <input type="range" min="0" max="100" value="80" class="slider" id="appraisal_accuracy"> 
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <p>Minimum accuracy with level known:</p> 
+            </th>
+        </tr>
+        <tr>
+            <td>
+                Accuracy: <span id="level_accuracy_value"></span>%                               
+            </td>
+            <td>
+                <input type="range" min="0" max="100" value="80" class="slider" id="level_accuracy"> 
+            </td>
+        </tr>        
+    </table>
+ 
+    <button type="button" onclick="calculation()">Start Calculation!</button>
+   
+</form>
+
+<table id="result" style="visibility:hidden;">
+</table>
+
+
+<script type="text/javascript">
+    var pokemon_list;
+    var pokemon_stat_array;
+    var pokemon_stat_row;
+    var pokemon_namelist;
+    var cpm = [0.094,
+0.135137432,
+0.16639787,
+0.192650919,
+0.21573247,
+0.236572661,
+0.25572005,
+0.273530381,
+0.29024988,
+0.306057377,
+0.3210876,
+0.335445036,
+0.34921268,
+0.362457751,
+0.37523559,
+0.387592406,
+0.39956728,
+0.411193551,
+0.42250001,
+0.432926419,
+0.44310755,
+0.4530599578,
+0.46279839,
+0.472336083,
+0.48168495,
+0.4908558,
+0.49985844,
+0.508701765,
+0.51739395,
+0.525942511,
+0.53435433,
+0.542635767,
+0.55079269,
+0.558830576,
+0.56675452,
+0.574569153,
+0.58227891,
+0.589887917,
+0.59740001,
+0.604818814,
+0.61215729,
+0.619399365,
+0.62656713,
+0.633644533,
+0.64065295,
+0.647576426,
+0.65443563,
+0.661214806,
+0.667934,
+0.674577537,
+0.68116492,
+0.687680648,
+0.69414365,
+0.700538673,
+0.70688421,
+0.713164996,
+0.71939909,
+0.725571552,
+0.7317,
+0.734741009,
+0.73776948,
+0.740785574,
+0.74378943,
+0.746781211,
+0.74976104,
+0.752729087,
+0.75568551,
+0.758630378,
+0.76156384,
+0.764486065,
+0.76739717,
+0.770297266,
+0.7731865,
+0.776064962,
+0.77893275,
+0.781790055,
+0.78463697,
+0.787473578,
+0.79030001]
+
+    var species = document.getElementById("species");
+    
+    var attack_equality = document.getElementById("atk_range");
+    var attack_iv = document.getElementById("atk_iv");
+    
+    var defense_equality = document.getElementById("def_range");
+    var defense_iv = document.getElementById("def_iv");
+    
+    var hp_equality = document.getElementById("sta_range");
+    var hp_iv = document.getElementById("sta_iv");
+    
+    var sum_equality = document.getElementById("sum_range");
+    var sum_iv = document.getElementById("sum_iv");
+
+    var cp_slider = document.getElementById("cp_accuracy");
+    var cp_slider_visualize = document.getElementById("cp_accuracy_value");
+    
+    var summary_slider = document.getElementById("summary_accuracy");
+    var summary_slider_visualize = document.getElementById("summary_accuracy_value");
+    
+    var appraisal_slider = document.getElementById("appraisal_accuracy");
+    var appraisal_slider_visualize = document.getElementById("appraisal_accuracy_value");
+    
+    var level_slider = document.getElementById("level_accuracy");
+    var level_slider_visualize = document.getElementById("level_accuracy_value");
+    
+    var power_up_cost = [];
+    var max_cp = [];
+    var actual_bound = 0;
+    
+    var result_table = document.getElementById("result");
+
+    var fileInput = document.getElementById("csv"),
+
+    readFile = function () {
+        var reader = new FileReader();
+        reader.onload = function () {
+            pokemon_stat_array = [];
+            pokemon_namelist = []
+            pokemon_stat_table = reader.result.split('\n');
+            //Here we expect the first line is titles of columns
+            for (var count = 1; count < pokemon_stat_table.length; ++count){
+                pokemon_stat = pokemon_stat_table[count].split(','); 
+                pokemon_stat_row = [];
+                pokemon_namelist[count-1] = pokemon_stat[0];
+                for (var count_nested = 1; count_nested < pokemon_stat.length; ++count_nested){        
+                    pokemon_stat_row[count_nested-1] = parseInt(pokemon_stat[count_nested]);                    
+                }
+                pokemon_stat_array[count-1] = pokemon_stat_row;
+    	    }
+    	    var csv_text = document.getElementById("csv_instruction");
+    	    var csv = document.getElementById("csv");
+    	    var form = document.getElementById("Query");
+    	    csv_text.style.display = 'none';
+    	    csv.style.display = 'none';
+    	    form.style.visibility = "visible";
+    	    var dropdown = "";
+    	    for (var count = 0; count < pokemon_namelist.length; ++count){
+                dropdown = dropdown + "<option value=" + '\"' + count + '\"' + ">" + pokemon_namelist[count] + "</option>";
+    	    }
+    	    species.innerHTML = dropdown;
+        };
+        // start reading the file. When it is done, calls the onload event defined above.
+        reader.readAsBinaryString(fileInput.files[0]);
+    };
+
+    fileInput.addEventListener('change', readFile);
+    
+
+    cp_slider_visualize.innerHTML = cp_slider.value;
+    cp_slider.oninput = function() {
+      cp_slider_visualize.innerHTML = this.value;
+    }
+    
+    summary_slider_visualize.innerHTML = summary_slider.value;
+    summary_slider.oninput = function() {
+      summary_slider_visualize.innerHTML = this.value;
+    }
+    
+    appraisal_slider_visualize.innerHTML = appraisal_slider.value;
+    appraisal_slider.oninput = function() {
+      appraisal_slider_visualize.innerHTML = this.value;
+    }
+    
+    level_slider_visualize.innerHTML = level_slider.value;
+    level_slider.oninput = function() {
+      level_slider_visualize.innerHTML = this.value;
+    }
+    
+    function calculation() {
+        result_table.innerHTML = "";
+        pokemon_entry_no = parseInt(species.value);
+        var go_base_stat = go_msg_stat_conversion(pokemon_entry_no);
+        var constrain_tensor = generate_constrain_matrix();  
+        var cp_iv_hash_map = go_cp_calculation(go_base_stat, constrain_tensor);
+        table_generation(go_base_stat, cp_iv_hash_map, cp_slider.value, 0);
+        table_generation(go_base_stat, cp_iv_hash_map, summary_slider.value, 1);
+        table_generation(go_base_stat, cp_iv_hash_map, appraisal_slider.value, 2);
+        table_generation(go_base_stat, cp_iv_hash_map, level_slider.value, 3);
+        result_table.style.visibility = "visible";
+        return;
+    } 
+    
+    function generate_constrain_matrix() {
+        var constrain_tensor = [];
+        var sum_constrain = sum_equality.value;
+        var sum_bound = parseInt(sum_iv.value);
+        for (var atk = 0; atk < 16; ++atk){
+            var constrain_matrix = [];
+            var atk_bound = parseInt(attack_iv.value);
+            if (atk_bound != -1) {
+                switch (attack_equality.value) {
+                    case "0":
+                        if (atk < atk_bound) {
+                            continue;
+                        }
+                        break;
+                    case "1":
+                        if (atk != atk_bound) {
+                            continue;
+                        }
+                        break;
+                    default:
+                        if (atk > atk_bound) {
+                            continue;
+                        }
+                        break;                
+                }
+            }
+            for (var def = 0; def < 16; ++def){
+                constrain_list = [];
+                var def_bound = parseInt(defense_iv.value);
+                if (def_bound != -1) {
+                    switch (defense_equality.value) {
+                        case "0":
+                            if (def < def_bound) {
+                                continue;
+                            }
+                            break;
+                        case "1":
+                            if (def != def_bound) {
+                                continue;
+                            }
+                            break;
+                        default:
+                            if (def > def_bound) {
+                                continue;
+                            }
+                            break;                
+                    }
+                }
+                for (var hp = 0; hp < 16; ++hp){
+                    var hp_bound = parseInt(hp_iv.value);
+                    if (hp_bound != -1) {
+                        switch (hp_equality.value) {
+                            case "0":
+                                if (hp < hp_bound) {
+                                    constrain_list[hp] = false;
+                                    continue;
+                                }
+                                break;
+                            case "1":
+                                if (hp != hp_bound) {
+                                    constrain_list[hp] = false;
+                                    continue;
+                                }
+                                break;
+                            default:
+                                if (hp > hp_bound) {
+                                    constrain_list[hp] = false;
+                                    continue;
+                                }
+                                break;                
+                        }
+                    }
+                    iv_total = atk+def+hp;
+                    if (sum_bound != -1) {
+                        switch (sum_constrain) {
+                            case "0":
+                                if (iv_total < sum_bound) {
+                                    constrain_list[hp] = false;
+                                    continue;
+                                }
+                                break;
+                            case "1":
+                                if (iv_total != sum_bound) {
+                                    constrain_list[hp] = false;
+                                    continue;
+                                }
+                                break;
+                            default:
+                                if (iv_total > sum_bound) {
+                                    constrain_list[hp] = false;
+                                    continue;
+                                }
+                                break;                
+                        }
+                    }
+                    constrain_list[hp] = true;                    
+                }
+                constrain_matrix[def] = constrain_list;
+            }
+            constrain_tensor[atk] = constrain_matrix;
+        }
+        return constrain_tensor;
+    }
+    
+    function go_msg_stat_conversion(pokemon_entry_no) {
+        var msg_stat = pokemon_stat_array[pokemon_entry_no];
+        var speedmod = 1+((msg_stat[5]-75)/500);
+        var mixed_attack = Math.round(((Math.max(msg_stat[1], msg_stat[3])*7/8) + (Math.min(msg_stat[1], msg_stat[3])*1/8))*2);
+        var theory_attack = Math.round(mixed_attack*speedmod);
+        var mixed_defense = Math.round(((Math.max(msg_stat[2], msg_stat[4])*5/8) + (Math.min(msg_stat[2], msg_stat[4])*3/8))*2);
+        var theory_defense = Math.round(mixed_defense*speedmod);
+        var theory_hp = Math.floor(50+1.75*msg_stat[0]);
+        var theory_max_cp = Math.floor((theory_attack+15)*Math.sqrt(theory_defense+15)*Math.sqrt(theory_hp+15)*Math.pow(cpm[78],2)/10);
+        //alert([speedmod,mixed_attack, theory_attack,mixed_defense,theory_defense,theory_hp,theory_max_cp]);
+        if (theory_max_cp < 4000) {
+            var go_base_stat = [theory_hp, theory_attack, theory_defense];
+            return go_base_stat;
+        } else {
+            var circle_9_nerf_attack = Math.round(mixed_attack*speedmod*0.91);
+            var circle_9_nerf_defense = Math.round(mixed_defense*speedmod*0.91);
+            var circle_9_nerf_hp = Math.round((50+1.75*msg_stat[0])*0.91);
+            var go_base_stat = [circle_9_nerf_hp, circle_9_nerf_attack, circle_9_nerf_defense];
+            return go_base_stat;
+        }
+    }
+    
+    //only put any level,IVs combination which create targeted CP into the map to reduce size
+    function go_cp_calculation(go_base_stat, constrains) {
+        var dust = 0;
+        var cp_iv_map = [];
+        for (var level = 0; level < 35; ++level){
+            if (level % 2 == 0) {
+                if (level < 10) {
+                    dust += 200;
+                } else if (level < 20) {
+                    dust += 300;
+                } else if (level < 30) {
+                    dust += 500;
+                } else {
+                    dust += 1000;
+                }
+                power_up_cost.push(dust);
+            }
+            for (var attack = 0; attack < 16; ++attack){
+                for (var defense = 0; defense < 16; ++defense){
+                    for (var hp = 0; hp < 16; ++hp){
+                        var cp = Math.max(10, Math.floor((go_base_stat[1]+attack)*Math.sqrt(go_base_stat[2]+defense)*Math.sqrt(go_base_stat[0]+hp)*Math.pow(cpm[level*2],2)/10));
+                        var actual_hp = Math.floor((go_base_stat[0]+hp)*cpm[level*2]);
+                        if ((attack == 15) && (defense == 15) && (hp == 15)) {
+                            max_cp.push(cp);                       
+                        }
+                        if (typeof cp_iv_map[cp] == 'undefined') {
+                            if (typeof constrains[attack] == 'undefined') {
+                                continue;
+                            } else if (typeof constrains[attack][defense] == 'undefined') {
+                                continue;
+                            } else if (constrains[attack][defense][hp] == true) {
+                                cp_iv_map[cp] = [];
+                                var state = [level, dust, attack, defense, hp, actual_hp, true];
+                                cp_iv_map[cp].push(state);                               
+                            } 
+                        } else {
+                            if (typeof constrains[attack] == 'undefined') {
+                                var crash = [level, dust, attack, defense, hp, actual_hp, false];
+                                cp_iv_map[cp].push(crash);
+                            } else if (typeof constrains[attack][defense] == 'undefined') {
+                                var crash = [level, dust, attack, defense, hp, actual_hp, false];
+                                cp_iv_map[cp].push(crash);
+                            } else if (constrains[attack][defense][hp] == true) {
+                                var crash = [level, dust, attack, defense, hp, actual_hp, true];
+                                cp_iv_map[cp].push(crash);                            
+                            } else {
+                                var crash = [level, dust, attack, defense, hp, actual_hp, false];
+                                cp_iv_map[cp].push(crash);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return cp_iv_map;
+    }
+    
+    function table_generation(go_base_stat, cp_iv_hash_map, constrain_accuracy, mode) {
+        var para = document.createElement("tr");
+        var line = document.createElement("th");
+        var node;
+        switch (mode) {
+            case 0:
+                node = document.createTextNode("CP List with CP value seen");
+                break;
+            case 1:
+                node = document.createTextNode("CP List with HP, power up dust cost seen");
+                break;
+            case 2:
+                node = document.createTextNode("CP List with appraisal seen");
+                break;
+            case 3:
+                node = document.createTextNode("CP List with level known");
+                break;
+        }
+        line.appendChild(node);
+        para.appendChild(line);
+        result_table.appendChild(para);
+        var para = document.createElement("tr");
+        switch (mode) {            
+            case 3:            
+                var line = document.createElement("th");
+                node = document.createTextNode("Level");
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("Max CP");
+                line.appendChild(node);
+                para.appendChild(line);                
+            case 2:  
+                var line = document.createElement("th");
+                node = document.createTextNode("Attack IV");
+                line.appendChild(node);    
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("Defense IV");
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("Stamina IV");
+                line.appendChild(node);  
+                para.appendChild(line);         
+                var line = document.createElement("th");
+                node = document.createTextNode("CP Value of next power up");
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("CP Value after 2 power up");
+                line.appendChild(node);  
+                para.appendChild(line);                            
+            case 1:
+                var line = document.createElement("th");
+                node = document.createTextNode("Power Up Cost");
+                line.appendChild(node);  
+                para.appendChild(line);   
+                var line = document.createElement("th");
+                node = document.createTextNode("HP");
+                line.appendChild(node); 
+                para.appendChild(line);                                                                                  
+            case 0:
+                var line = document.createElement("th");
+                node = document.createTextNode("CP Value");
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("True Positive");
+                line.appendChild(node);    
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("Total number of combination");
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("Accuracy");
+                line.appendChild(node);                 
+            default:
+                para.appendChild(line);
+                result_table.appendChild(para);
+                break;
+        }
+        for (var cp = 0; cp < 4000; ++cp){
+            if (typeof cp_iv_hash_map[cp] == 'undefined') {
+                continue;
+            }
+            switch (mode) {
+                case 0:
+                    var true_positive = 0;
+                    for (var crash = 0; crash < cp_iv_hash_map[cp].length; ++crash){
+                        if (cp_iv_hash_map[cp][crash][6]) {
+                            ++true_positive;
+                        }
+                    }
+                    var accuracy = true_positive*100/cp_iv_hash_map[cp].length;
+                    if (accuracy > constrain_accuracy) {
+                        var data = [cp, true_positive, cp_iv_hash_map[cp].length, accuracy];
+                        generate_table_row(data, mode);
+                    }
+                    break; 
+                case 2: 
+                case 3:
+                    var sum_constrain = sum_equality.value;
+                    var sum_bound = parseInt(sum_iv.value);
+                    var atk_bound = parseInt(attack_iv.value);
+                    var def_bound = parseInt(defense_iv.value);
+                    var hp_bound = parseInt(hp_iv.value);
+                    if (attack_equality.value != "2") {
+                        actual_bound += atk_bound;
+                    }
+                    if (defense_equality.value != "2") {
+                        actual_bound += def_bound;
+                    }
+                    if (hp_equality.value != "2") {
+                        actual_bound += hp_bound;
+                    }  
+                    if (sum_bound > actual_bound) {
+                        actual_bound = sum_bound;
+                    }
+                    if (actual_bound < 23) {
+                        actual_bound = 0;
+                    } else if (actual_bound < 30) {
+                        actual_bound = 23;
+                    } else if (actual_bound < 37) {
+                        actual_bound = 30;
+                    } else {
+                        actual_bound = 37;
+                    }                    
+                case 1:   
+                    if (mode == 1) {
+                        actual_bound = -1;
+                    }   
+                    var checked = [];                              
+                    for (var crash = 0; crash < cp_iv_hash_map[cp].length; ++crash){
+                        var stat = [];
+                        if (cp_iv_hash_map[cp][crash][6]) {
+                            if (typeof checked[crash] == 'undefined') {
+                                var true_positive = 1;
+                                var no_of_crash = 1;
+                                checked[crash] = true;
+                                stat.push(cp_iv_hash_map[cp][crash]);
+                                for (var crash_forward = 0; crash_forward < cp_iv_hash_map[cp].length; ++crash_forward){
+                                    if (typeof checked[crash_forward] != 'undefined') {
+                                        continue;
+                                    } else {
+                                        var check_stat = cp_iv_hash_map[cp][crash_forward];
+                                        var iv_sum = check_stat[2] + check_stat[3] + check_stat[4];
+                                        if (iv_sum < actual_bound) {
+                                            checked[crash_forward] = true;
+                                            continue;
+                                        } else {
+                                            var mode_1_2_check = (check_stat[1] == cp_iv_hash_map[cp][crash][1])&&(check_stat[5] == cp_iv_hash_map[cp][crash][5])&&((mode == 2)||(mode == 1));
+                                            var mode_3_check = (check_stat[0] == cp_iv_hash_map[cp][crash][0])&&(check_stat[5] == cp_iv_hash_map[cp][crash][5])&&(mode == 3);
+                                            if (mode_1_2_check || mode_3_check) {
+                                                checked[crash_forward] = true;
+                                                if (check_stat[6]) {
+                                                    ++true_positive;
+                                                    ++no_of_crash;
+                                                } else {
+                                                    ++no_of_crash;
+                                                }
+                                                stat.push(cp_iv_hash_map[cp][crash_forward]);
+                                            }
+                                        }
+                                    }
+                                }
+                                var accuracy = true_positive*100/no_of_crash;
+                                if (accuracy > constrain_accuracy) {
+                                    for (var candidate_no = 0; candidate_no < stat.length; ++candidate_no){
+                                        var candidate = stat[candidate_no];
+                                        var power_up_once = Math.max(10, Math.floor((go_base_stat[1]+candidate[2])*Math.sqrt(go_base_stat[2]+candidate[3])*Math.sqrt(go_base_stat[0]+candidate[4])*Math.pow(cpm[candidate[0]*2+1],2)/10));
+                                        var power_up_twice = Math.max(10, Math.floor((go_base_stat[1]+candidate[2])*Math.sqrt(go_base_stat[2]+candidate[3])*Math.sqrt(go_base_stat[0]+candidate[4])*Math.pow(cpm[candidate[0]*2+2],2)/10));
+                                        switch (mode) {
+                                            case 1:
+                                                var data = [cp, true_positive, no_of_crash, accuracy, candidate[1], candidate[5]];
+                                                generate_table_row(data, mode);
+                                                break;
+                                            case 2:
+                                                var data = [cp, true_positive, no_of_crash, accuracy, candidate[1], candidate[5], candidate[2], candidate[3], candidate[4], power_up_once, power_up_twice];
+                                                generate_table_row(data, mode);
+                                                break;
+                                            case 3:
+                                                var data = [cp, true_positive, no_of_crash, accuracy, candidate[1], candidate[5], candidate[2], candidate[3], candidate[4], power_up_once, power_up_twice, (candidate[0]+1), max_cp[candidate[0]]];
+                                                generate_table_row(data, mode);
+                                                break;
+                                        }
+                                    }
+                                }
+                            }    
+                        }
+                    }
+                    break;                                                                                  
+            }
+        }
+        return;
+    }
+    
+    function generate_table_row(data, mode) {
+        var para = document.createElement("tr");
+        switch (mode) {
+            case 3:
+                var line = document.createElement("td");
+                var node = document.createTextNode(data[11]);
+                line.appendChild(node);  
+                para.appendChild(line);  
+                var line = document.createElement("td");
+                var node = document.createTextNode(data[12]);
+                line.appendChild(node);  
+                para.appendChild(line);                           
+            case 2:            
+                var line = document.createElement("td");
+                var node = document.createTextNode(data[6]);
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("td");
+                var node = document.createTextNode(data[7]);
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("td");
+                var node = document.createTextNode(data[8]);
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("td");
+                var node = document.createTextNode(data[9]);
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("td");
+                var node = document.createTextNode(data[10]);
+                line.appendChild(node);
+                para.appendChild(line);                
+            case 1:
+                var line = document.createElement("td");
+                var node = document.createTextNode(data[4]);
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("td");
+                var node = document.createTextNode(data[5]);
+                line.appendChild(node);
+                para.appendChild(line);                                                                                   
+            case 0:
+                var line = document.createElement("td");
+                var node = document.createTextNode(data[0]);
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("td");
+                var node = document.createTextNode(data[1]);
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("td");
+                var node = document.createTextNode(data[2]);
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("td");
+                var output_str = "" + data[3] + "%";
+                var node = document.createTextNode(output_str);
+                line.appendChild(node);       
+            default:
+                para.appendChild(line);
+                result_table.appendChild(para);  
+                break;
+        }        
+         return;   
+    }
+    
+    
+</script>
+
+</body>	
+</html>
