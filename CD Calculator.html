@@ -712,6 +712,7 @@
     }
     
     function table_generation(go_base_stat, cp_iv_hash_map, constrain_accuracy, mode) {
+        candidate_cp = [];
         write_table_header(mode);
         write_summarized_table_header(mode);
         for (var cp = 0; cp < 5000; ++cp){
@@ -807,14 +808,41 @@
                                         var power_up_twice = Math.max(10, Math.floor((go_base_stat[1]+candidate[2])*Math.sqrt(go_base_stat[2]+candidate[3])*Math.sqrt(go_base_stat[0]+candidate[4])*Math.pow(cpm[candidate[0]*2+2],2)/10));
                                         switch (mode) {
                                             case 1:
+                                                if (typeof candidate_cp[candidate[1]] == 'undefined') {
+                                                    candidate_cp[candidate[1]] = [];
+                                                    candidate_cp[candidate[1]][candidate[5]] = [];
+                                                } else {
+                                                    if (typeof candidate_cp[candidate[1]][candidate[5]] == 'undefined') {
+                                                        candidate_cp[candidate[1]][candidate[5]] = [];
+                                                    }                                               
+                                                }
+                                                candidate_cp[candidate[1]][candidate[5]].push([cp, candidate[1], candidate[5]]);
                                                 var data = [cp, true_positive, no_of_crash, accuracy, candidate[1], candidate[5]];
                                                 generate_table_row(data, mode);
                                                 break;
                                             case 2:
+                                                if (typeof candidate_cp[candidate[1]] == 'undefined') {
+                                                    candidate_cp[candidate[1]] = [];
+                                                    candidate_cp[candidate[1]][candidate[5]] = [];
+                                                } else {
+                                                    if (typeof candidate_cp[candidate[1]][candidate[5]] == 'undefined') {
+                                                        candidate_cp[candidate[1]][candidate[5]] = [];
+                                                    }                                               
+                                                }
+                                                candidate_cp[candidate[1]][candidate[5]].push([cp, candidate[1], candidate[5], candidate[2], candidate[3], candidate[4], power_up_once, power_up_twice]);     
                                                 var data = [cp, true_positive, no_of_crash, accuracy, candidate[1], candidate[5], candidate[2], candidate[3], candidate[4], power_up_once, power_up_twice];
                                                 generate_table_row(data, mode);
                                                 break;
                                             case 3:
+                                                if (typeof candidate_cp[candidate[0]] == 'undefined') {
+                                                    candidate_cp[candidate[0]] = [];
+                                                    candidate_cp[candidate[0]][candidate[5]] = [];
+                                                } else {
+                                                    if (typeof candidate_cp[candidate[0]][candidate[5]] == 'undefined') {
+                                                        candidate_cp[candidate[0]][candidate[5]] = [];
+                                                    }                                                      
+                                                }
+                                                candidate_cp[candidate[0]][candidate[5]].push([cp, candidate[1], candidate[5], candidate[2], candidate[3], candidate[4], power_up_once, power_up_twice, max_cp[candidate[0]]]);  
                                                 var data = [cp, true_positive, no_of_crash, accuracy, candidate[1], candidate[5], candidate[2], candidate[3], candidate[4], power_up_once, power_up_twice, (candidate[0]+1), max_cp[candidate[0]]];
                                                 generate_table_row(data, mode);
                                                 break;
@@ -827,7 +855,7 @@
                     break;                                                                                  
             }
         }
-        generate_summarized_table([candidate_cp], mode);
+        generate_summarized_table(candidate_cp, mode);
         return;
     }
     
@@ -938,18 +966,24 @@
         para.appendChild(line);
         summarized_result.appendChild(para);
         var para = document.createElement("tr");
-        switch (mode) {            
-            case 3:            
+        switch (mode) {          
             case 2:                         
             case 1:
                 var line = document.createElement("th");
                 node = document.createTextNode("Power Up Cost");
                 line.appendChild(node);  
                 para.appendChild(line);   
+            case 3:
+                if (mode == 3){
+                    var line = document.createElement("th");
+                    node = document.createTextNode("Level");
+                    line.appendChild(node); 
+                    para.appendChild(line);                 
+                }
                 var line = document.createElement("th");
                 node = document.createTextNode("HP Value");
                 line.appendChild(node); 
-                para.appendChild(line);                                                                                  
+                para.appendChild(line);                                                                               
             case 0:
                 var line = document.createElement("th");
                 node = document.createTextNode("CP Range");
@@ -1029,27 +1063,28 @@
     }
     
     function generate_summarized_table(data, mode) {
-        switch (mode) {
-            case 3:                        
-            case 2:                          
-            case 1:
-                break;                                                                                  
+        switch (mode) {                                                                  
             case 0:
-                var candidate_cp = data[0];
+                var candidate_cp = data;
                 var lower_bound = candidate_cp[0];
                 var higher_bound = candidate_cp[0];
                 for (var count = 1; count < candidate_cp.length; ++count){
                     var cp = candidate_cp[count];
-                    if (higher_bound != (cp-1)) {
+                    if (higher_bound < (cp-1)) {
                         var para = document.createElement("tr");
                         var line = document.createElement("td");
-                        var output_str = "" + lower_bound + "-" + higher_bound;
-                        var node = document.createTextNode(output_str);
+                        var node;
+                        if (lower_bound == higher_bound){
+                            node = document.createTextNode(lower_bound);
+                        } else {
+                            var output_str = "" + lower_bound + "-" + higher_bound;
+                            node = document.createTextNode(output_str);
+                        }
                         line.appendChild(node);
                         para.appendChild(line);
                         summarized_result.appendChild(para); 
-                        lower_bound = candidate_cp[count];
-                        higher_bound = candidate_cp[count];
+                        lower_bound = cp;
+                        higher_bound = cp;
                     } else {
                         higher_bound = cp;
                     }
@@ -1062,8 +1097,240 @@
                 para.appendChild(line);
                 summarized_result.appendChild(para); 
                 break;
-            default:
-                break;
+            case 1:
+            case 2:
+                var candidate_cp = data;
+                for (var count = 0; count < power_up_cost.length; ++count){
+                    var dust_level = power_up_cost[count];
+                    for (var hp = 1; hp < 1000; ++hp){
+                        if (typeof candidate_cp[dust_level][hp] == 'undefined') {
+                            continue;
+                        } else {
+                            var para = document.createElement("tr");
+                            var line = document.createElement("td");
+                            var node = document.createTextNode(dust_level);
+                            line.appendChild(node);
+                            para.appendChild(line);  
+                            var line = document.createElement("td");
+                            var node = document.createTextNode(hp);
+                            line.appendChild(node);
+                            para.appendChild(line); 
+                            var line = document.createElement("td");  
+                            var output_str = "";
+                            var candidate_cp = data;
+                            var lower_bound = candidate_cp[dust_level][hp][0][0];
+                            var higher_bound = candidate_cp[dust_level][hp][0][0];                                                   
+                            for (var count_inner = 1; count_inner < candidate_cp[dust_level][hp].length; ++count_inner){
+                                var cp = candidate_cp[dust_level][hp][count_inner][0];
+                                if (higher_bound < (cp-1)) {
+                                    if (lower_bound == higher_bound){
+                                        output_str = output_str + lower_bound + ", ";
+                                    } else {
+                                        output_str = output_str + lower_bound + "-" + higher_bound + ", ";
+                                    }
+                                    lower_bound = cp;
+                                    higher_bound = cp;
+                                } else {
+                                    higher_bound = cp;
+                                }
+                            }
+                            if (lower_bound == higher_bound){
+                                output_str = output_str + lower_bound;
+                            } else {
+                                output_str = output_str + lower_bound + "-" + higher_bound;
+                            }
+                            var node = document.createTextNode(output_str);
+                            line.appendChild(node);
+                            para.appendChild(line);
+                            summarized_result.appendChild(para); 
+                            if (mode == 2){
+                                var para = document.createElement("tr");
+                                var line = document.createElement("th");
+                                var node = document.createTextNode("");
+                                line.appendChild(node);
+                                para.appendChild(line);                                  
+                                var line = document.createElement("th");
+                                var node = document.createTextNode("CP Value");
+                                line.appendChild(node);
+                                para.appendChild(line);  
+                                var line = document.createElement("th");
+                                var node = document.createTextNode("Atk IV");
+                                line.appendChild(node);
+                                para.appendChild(line); 
+                                var line = document.createElement("th");
+                                var node = document.createTextNode("Def IV");
+                                line.appendChild(node);
+                                para.appendChild(line); 
+                                var line = document.createElement("th");
+                                var node = document.createTextNode("Sta IV");
+                                line.appendChild(node);
+                                para.appendChild(line); 
+                                var line = document.createElement("th");
+                                var node = document.createTextNode("CP at next power up");
+                                line.appendChild(node);
+                                para.appendChild(line);       
+                                var line = document.createElement("th");
+                                var node = document.createTextNode("CP after 2 power up");
+                                line.appendChild(node);
+                                para.appendChild(line);  
+                                summarized_result.appendChild(para); 
+                                for (var count_inner = 0; count_inner < candidate_cp[dust_level][hp].length; ++count_inner){
+                                    var para = document.createElement("tr");
+                                    var stat = candidate_cp[dust_level][hp][count_inner];
+                                    var line = document.createElement("td");
+                                    var node = document.createTextNode("");
+                                    line.appendChild(node);
+                                    para.appendChild(line);                                    
+                                    var line = document.createElement("td");
+                                    var node = document.createTextNode(stat[0]);
+                                    line.appendChild(node);
+                                    para.appendChild(line);
+                                    var line = document.createElement("td");
+                                    var node = document.createTextNode(stat[3]);
+                                    line.appendChild(node);
+                                    para.appendChild(line);
+                                    var line = document.createElement("td");
+                                    var node = document.createTextNode(stat[4]);
+                                    line.appendChild(node);
+                                    para.appendChild(line);
+                                    var line = document.createElement("td");
+                                    var node = document.createTextNode(stat[5]);
+                                    line.appendChild(node);
+                                    para.appendChild(line);     
+                                    var line = document.createElement("td");
+                                    var node = document.createTextNode(stat[6]);
+                                    line.appendChild(node);
+                                    para.appendChild(line);     
+                                    var line = document.createElement("td");
+                                    var node = document.createTextNode(stat[7]);
+                                    line.appendChild(node);
+                                    para.appendChild(line);                                                                                                                                                                                
+                                    summarized_result.appendChild(para); 
+                                }                                                                                                                      
+                            }
+                        }
+                    }
+                }
+                break;  
+            case 3: 
+                var candidate_cp = data;
+                for (var level = 0; level < 35; ++level){
+                    for (var hp = 1; hp < 1000; ++hp){
+                        if (typeof candidate_cp[level][hp] == 'undefined') {
+                            continue;
+                        } else {
+                            var para = document.createElement("tr");
+                            var line = document.createElement("td");
+                            var node = document.createTextNode((level+1));
+                            line.appendChild(node);
+                            para.appendChild(line);  
+                            var line = document.createElement("td");
+                            var node = document.createTextNode(hp);
+                            line.appendChild(node);
+                            para.appendChild(line); 
+                            var line = document.createElement("td");  
+                            var output_str = "";
+                            var candidate_cp = data;
+                            var lower_bound = candidate_cp[level][hp][0][0];
+                            var higher_bound = candidate_cp[level][hp][0][0];                                                   
+                            for (var count_inner = 1; count_inner < candidate_cp[level][hp].length; ++count_inner){
+                                var cp = candidate_cp[level][hp][count_inner][0];
+                                if (higher_bound < (cp-1)) {
+                                    if (lower_bound == higher_bound){
+                                        output_str = output_str + lower_bound + ", ";
+                                    } else {
+                                        output_str = output_str + lower_bound + "-" + higher_bound + ", ";
+                                    }
+                                    lower_bound = cp;
+                                    higher_bound = cp;
+                                } else {
+                                    higher_bound = cp;
+                                }
+                            }
+                            if (lower_bound == higher_bound){
+                                output_str = output_str + lower_bound;
+                            } else {
+                                output_str = output_str + lower_bound + "-" + higher_bound;
+                            }
+                            var node = document.createTextNode(output_str);
+                            line.appendChild(node);
+                            para.appendChild(line);
+                            summarized_result.appendChild(para); 
+                            var para = document.createElement("tr");
+                            var line = document.createElement("th");
+                            var node = document.createTextNode("");
+                            line.appendChild(node);
+                            para.appendChild(line);                                  
+                            var line = document.createElement("th");
+                            var node = document.createTextNode("CP Value");
+                            line.appendChild(node);
+                            para.appendChild(line);  
+                            var line = document.createElement("th");
+                            var node = document.createTextNode("Max CP");
+                            line.appendChild(node);
+                            para.appendChild(line);                                 
+                            var line = document.createElement("th");
+                            var node = document.createTextNode("Atk IV");
+                            line.appendChild(node);
+                            para.appendChild(line); 
+                            var line = document.createElement("th");
+                            var node = document.createTextNode("Def IV");
+                            line.appendChild(node);
+                            para.appendChild(line); 
+                            var line = document.createElement("th");
+                            var node = document.createTextNode("Sta IV");
+                            line.appendChild(node);
+                            para.appendChild(line); 
+                            var line = document.createElement("th");
+                            var node = document.createTextNode("CP at next power up");
+                            line.appendChild(node);
+                            para.appendChild(line);       
+                            var line = document.createElement("th");
+                            var node = document.createTextNode("CP after 2 power up");
+                            line.appendChild(node);
+                            para.appendChild(line);  
+                            summarized_result.appendChild(para); 
+                            for (var count_inner = 0; count_inner < candidate_cp[level][hp].length; ++count_inner){
+                                var para = document.createElement("tr");
+                                var stat = candidate_cp[level][hp][count_inner];
+                                var line = document.createElement("td");
+                                var node = document.createTextNode("");
+                                line.appendChild(node);
+                                para.appendChild(line);                                    
+                                var line = document.createElement("td");
+                                var node = document.createTextNode(stat[0]);
+                                line.appendChild(node);
+                                para.appendChild(line);
+                                var line = document.createElement("td");
+                                var node = document.createTextNode(stat[8]);
+                                line.appendChild(node);
+                                para.appendChild(line);                                     
+                                var line = document.createElement("td");
+                                var node = document.createTextNode(stat[3]);
+                                line.appendChild(node);
+                                para.appendChild(line);
+                                var line = document.createElement("td");
+                                var node = document.createTextNode(stat[4]);
+                                line.appendChild(node);
+                                para.appendChild(line);
+                                var line = document.createElement("td");
+                                var node = document.createTextNode(stat[5]);
+                                line.appendChild(node);
+                                para.appendChild(line);     
+                                var line = document.createElement("td");
+                                var node = document.createTextNode(stat[6]);
+                                line.appendChild(node);
+                                para.appendChild(line);     
+                                var line = document.createElement("td");
+                                var node = document.createTextNode(stat[7]);
+                                line.appendChild(node);
+                                para.appendChild(line);                                                                                                                                                                                
+                                summarized_result.appendChild(para); 
+                            }
+                        }
+                    }
+                }
+                break;                       
         }        
          return; 
     }
