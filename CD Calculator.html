@@ -261,9 +261,13 @@
 
 <p id="expected_value" style="visibility:hidden;"/>
 
-<table id="result" style="visibility:hidden;">
+<button type="button" id="tldr_button" onclick="show_compact_list()" style="visibility:hidden;">Show Compact List</button>
+
+<table id="summarized_result" style="display:none;">
 </table>
 
+<table id="result" style="visibility:hidden;">
+</table>
 
 <script type="text/javascript">
     var pokemon_list;
@@ -392,7 +396,12 @@
     var expected_value_lucky = 0;
     
     var expected_value_text = document.getElementById("expected_value");
-
+    
+    var tldr_button = document.getElementById("tldr_button");
+    var summarized_result = document.getElementById("summarized_result");
+    
+    var result_table = document.getElementById("result");
+    
     var fileInput = document.getElementById("csv"),
 
     readFile = function () {
@@ -482,6 +491,7 @@
         expected_value_message = expected_value_message + "Expected no of lucky trade to get one candidate " + pokemon_namelist[pokemon_entry_no] + ": " + expected_value_lucky + "<br/>";
         expected_value_text.innerHTML = expected_value_message;
         expected_value_text.style.visibility = "visible";
+        tldr_button.style.visibility = "visible";
         return;
     } 
     
@@ -621,7 +631,6 @@
         return constrain_tensor;
     }    
     
-    //only put any level,IVs combination which create targeted CP into the map to reduce size
     function go_cp_calculation(go_base_stat, constrains) {
         var dust = 0;
         var cp_iv_map = [];
@@ -648,11 +657,18 @@
                         }
                         if (typeof cp_iv_map[cp] == 'undefined') {
                             if (typeof constrains[attack] == 'undefined') {
-                                continue;
+                                cp_iv_map[cp] = [];
+                                cp_iv_map[cp].push(false);
+                                var state = [level, dust, attack, defense, hp, actual_hp, false];
+                                cp_iv_map[cp].push(state); 
                             } else if (typeof constrains[attack][defense] == 'undefined') {
-                                continue;
+                                cp_iv_map[cp] = [];
+                                cp_iv_map[cp].push(false);
+                                var state = [level, dust, attack, defense, hp, actual_hp, false];
+                                cp_iv_map[cp].push(state); 
                             } else if (constrains[attack][defense][hp] == true) {
                                 cp_iv_map[cp] = [];
+                                cp_iv_map[cp].push(true);
                                 var state = [level, dust, attack, defense, hp, actual_hp, true];
                                 cp_iv_map[cp].push(state);                               
                             } 
@@ -664,6 +680,7 @@
                                 var crash = [level, dust, attack, defense, hp, actual_hp, false];
                                 cp_iv_map[cp].push(crash);
                             } else if (constrains[attack][defense][hp] == true) {
+                                cp_iv_map[cp][0] = true;
                                 var crash = [level, dust, attack, defense, hp, actual_hp, true];
                                 cp_iv_map[cp].push(crash);                            
                             } else {
@@ -674,6 +691,17 @@
                     }
                 }
             }
+        }
+        for (var cp = 0; cp < cp_iv_map.length; ++cp) {
+            if (typeof cp_iv_map[cp] == 'undefined') {
+                continue;
+            } else {
+                if (cp_iv_map[cp][0]) {
+                    cp_iv_map[cp].shift();
+                } else {
+                    cp_iv_map[cp] = [];
+                }               
+            } 
         }
         return cp_iv_map;
     }
@@ -941,6 +969,11 @@
                 break;
         }        
          return;   
+    }
+    
+    function show_compact_list() {
+        summarized_result.style.display = "block";
+        return;
     }
     
     
