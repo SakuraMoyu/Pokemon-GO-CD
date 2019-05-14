@@ -12,6 +12,8 @@ At this point a form shall pop up
 
 The calculation result will shown at the bottom, you can copy the table to excel and do what you want with the data.
 
+You may also click the "Show Compact List" button to get the summarized information of the data.
+
 
 
 How to interpret the data generated:
