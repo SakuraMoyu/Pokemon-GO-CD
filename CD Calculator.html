@@ -735,37 +735,8 @@
                     }
                     break; 
                 case 2: 
-                case 3:
-                    var sum_constrain = sum_equality.value;
-                    var sum_bound = parseInt(sum_iv.value);
-                    var atk_bound = parseInt(attack_iv.value);
-                    var def_bound = parseInt(defense_iv.value);
-                    var hp_bound = parseInt(hp_iv.value);
-                    if (attack_equality.value != "2") {
-                        actual_bound += atk_bound;
-                    }
-                    if (defense_equality.value != "2") {
-                        actual_bound += def_bound;
-                    }
-                    if (hp_equality.value != "2") {
-                        actual_bound += hp_bound;
-                    }  
-                    if (sum_bound > actual_bound) {
-                        actual_bound = sum_bound;
-                    }
-                    if (actual_bound < 23) {
-                        actual_bound = 0;
-                    } else if (actual_bound < 30) {
-                        actual_bound = 23;
-                    } else if (actual_bound < 37) {
-                        actual_bound = 30;
-                    } else {
-                        actual_bound = 37;
-                    }                    
-                case 1:   
-                    if (mode == 1) {
-                        actual_bound = -1;
-                    }   
+                case 3:                    
+                case 1:  
                     var checked = [];                              
                     for (var crash = 0; crash < cp_iv_hash_map[cp].length; ++crash){
                         var stat = [];
@@ -780,27 +751,21 @@
                                         continue;
                                     } else {
                                         var check_stat = cp_iv_hash_map[cp][crash_forward];
-                                        var iv_sum = check_stat[2] + check_stat[3] + check_stat[4];
-                                        if (iv_sum < actual_bound) {
+                                        var appraisal_crash = appraisal(cp_iv_hash_map[cp][crash][2], cp_iv_hash_map[cp][crash][3], cp_iv_hash_map[cp][crash][4]);
+                                        var appraisal_crash_forward = appraisal(check_stat[2], check_stat[3], check_stat[4]);
+                                        var appraisal_result = (appraisal_crash[0] == appraisal_crash_forward[0])&&(appraisal_crash[1] == appraisal_crash_forward[1])&&(appraisal_crash[2] == appraisal_crash_forward[2])&&(appraisal_crash[3] == appraisal_crash_forward[3])&&(appraisal_crash[4] == appraisal_crash_forward[4]);
+                                        var mode_1_check = (check_stat[1] == cp_iv_hash_map[cp][crash][1])&&(check_stat[5] == cp_iv_hash_map[cp][crash][5])&&(mode == 1);
+                                        var mode_2_check = (check_stat[1] == cp_iv_hash_map[cp][crash][1])&&(check_stat[5] == cp_iv_hash_map[cp][crash][5])&&(appraisal_result)&&(mode == 2);
+                                        var mode_3_check = (check_stat[0] == cp_iv_hash_map[cp][crash][0])&&(check_stat[5] == cp_iv_hash_map[cp][crash][5])&&(appraisal_result)&&(mode == 3);
+                                        if (mode_1_check || mode_2_check || mode_3_check) {
                                             checked[crash_forward] = true;
-                                            continue;
-                                        } else {
-                                            var appraisal_crash = appraisal(cp_iv_hash_map[cp][crash][2], cp_iv_hash_map[cp][crash][3], cp_iv_hash_map[cp][crash][4]);
-                                            var appraisal_crash_forward = appraisal(check_stat[2], check_stat[3], check_stat[4]);
-                                            var appraisal_result = (appraisal_crash[0] == appraisal_crash_forward[0])&&(appraisal_crash[1] == appraisal_crash_forward[1])&&(appraisal_crash[2] == appraisal_crash_forward[2])&&(appraisal_crash[3] == appraisal_crash_forward[3]);
-                                            var mode_1_check = (check_stat[1] == cp_iv_hash_map[cp][crash][1])&&(check_stat[5] == cp_iv_hash_map[cp][crash][5])&&(mode == 1);
-                                            var mode_2_check = (check_stat[1] == cp_iv_hash_map[cp][crash][1])&&(check_stat[5] == cp_iv_hash_map[cp][crash][5])&&(appraisal_result)&&(mode == 2);
-                                            var mode_3_check = (check_stat[0] == cp_iv_hash_map[cp][crash][0])&&(check_stat[5] == cp_iv_hash_map[cp][crash][5])&&(appraisal_result)&&(mode == 3);
-                                            if (mode_1_check || mode_2_check || mode_3_check) {
-                                                checked[crash_forward] = true;
-                                                if (check_stat[6]) {
-                                                    ++true_positive;
-                                                    ++no_of_crash;
-                                                } else {
-                                                    ++no_of_crash;
-                                                }
-                                                stat.push(cp_iv_hash_map[cp][crash_forward]);
+                                            if (check_stat[6]) {
+                                                ++true_positive;
+                                                ++no_of_crash;
+                                            } else {
+                                                ++no_of_crash;
                                             }
+                                            stat.push(cp_iv_hash_map[cp][crash_forward]);
                                         }
                                     }
                                 }
@@ -864,25 +829,35 @@
     }
     
     function appraisal(atk, def, sta) {
-        var appraisal_result = [false, false, false, -1];
+        var appraisal_result = [-1, false, false, false, -1];
+        var iv_sum = atk+def+sta;
+        if (iv_sum < 23) {
+            appraisal_result[0] = 0;
+        } else if (iv_sum < 30) {
+            appraisal_result[0] = 1;
+        } else if (iv_sum < 37) {
+            appraisal_result[0] = 2;
+        } else {
+            appraisal_result[0] = 3;
+        } 
         var best_stat = Math.max(atk, def, sta)
         if (atk == best_stat) {
-            appraisal_result[0] = true;
+            appraisal_result[1] = true;
         }
         if (def == best_stat) {
-            appraisal_result[1] = true;
+            appraisal_result[2] = true;
         }      
         if (sta == best_stat) {
-            appraisal_result[2] = true;
+            appraisal_result[3] = true;
         }
         if (best_stat < 8) {
-            appraisal_result[3] = 0;
+            appraisal_result[4] = 0;
         } else if (best_stat < 13) {
-            appraisal_result[3] = 1;
+            appraisal_result[4] = 1;
         } else if (best_stat < 15) {
-            appraisal_result[3] = 2;
+            appraisal_result[4] = 2;
         } else {
-            appraisal_result[3] = 3;
+            appraisal_result[4] = 3;
         }
         return appraisal_result;
     }
@@ -1011,13 +986,13 @@
                 var line = document.createElement("th");
                 node = document.createTextNode("HP Value");
                 line.appendChild(node); 
-                para.appendChild(line);                                                                               
+                para.appendChild(line);                                                                   
             case 0:
                 var line = document.createElement("th");
                 node = document.createTextNode("CP Range");
-                line.appendChild(node);          
-            default:
+                line.appendChild(node);
                 para.appendChild(line);
+            default:
                 summarized_result.appendChild(para);
                 break;
         }
@@ -1200,7 +1175,19 @@
                                 var line = document.createElement("th");
                                 var node = document.createTextNode("CP after 2 power up");
                                 line.appendChild(node);
-                                para.appendChild(line);  
+                                para.appendChild(line); 
+                                var line = document.createElement("th");
+                                node = document.createTextNode("Overall IV");
+                                line.appendChild(node);
+                                para.appendChild(line);                
+                                var line = document.createElement("th");
+                                node = document.createTextNode("Best stat(s)");
+                                line.appendChild(node);
+                                para.appendChild(line);
+                                var line = document.createElement("th");
+                                node = document.createTextNode("Range of best IV(s) stat");
+                                line.appendChild(node);
+                                para.appendChild(line);                                  
                                 summarized_result.appendChild(para); 
                                 for (var count_inner = 0; count_inner < candidate_cp[dust_level][hp].length; ++count_inner){
                                     var para = document.createElement("tr");
@@ -1232,8 +1219,9 @@
                                     var line = document.createElement("td");
                                     var node = document.createTextNode(stat[7]);
                                     line.appendChild(node);
-                                    para.appendChild(line);                                                                                                                                                                                
-                                    summarized_result.appendChild(para); 
+                                    para.appendChild(line);
+                                    var appraisal_result = appraisal(stat[3], stat[4], stat[5]);
+                                    generate_appraisal_report_and_print(appraisal_result, para);
                                 }                                                                                                                      
                             }
                         }
@@ -1316,7 +1304,19 @@
                             var line = document.createElement("th");
                             var node = document.createTextNode("CP after 2 power up");
                             line.appendChild(node);
-                            para.appendChild(line);  
+                            para.appendChild(line); 
+                            var line = document.createElement("th");
+                            node = document.createTextNode("Overall IV");
+                            line.appendChild(node);
+                            para.appendChild(line);                
+                            var line = document.createElement("th");
+                            node = document.createTextNode("Best stat(s)");
+                            line.appendChild(node);
+                            para.appendChild(line);
+                            var line = document.createElement("th");
+                            node = document.createTextNode("Range of best IV(s) stat");
+                            line.appendChild(node);
+                            para.appendChild(line);                             
                             summarized_result.appendChild(para); 
                             for (var count_inner = 0; count_inner < candidate_cp[level][hp].length; ++count_inner){
                                 var para = document.createElement("tr");
@@ -1353,7 +1353,8 @@
                                 var node = document.createTextNode(stat[7]);
                                 line.appendChild(node);
                                 para.appendChild(line);                                                                                                                                                                                
-                                summarized_result.appendChild(para); 
+                                var appraisal_result = appraisal(stat[3], stat[4], stat[5]);
+                                generate_appraisal_report_and_print(appraisal_result, para);
                             }
                         }
                     }
@@ -1361,6 +1362,69 @@
                 break;                       
         }        
          return; 
+    }
+    
+    function generate_appraisal_report_and_print(appraisal_result, para) {
+        switch (appraisal_result[0]) {
+            case 0:
+                var line = document.createElement("td");
+                var node = document.createTextNode("0-22/0%-48.9%");
+                line.appendChild(node);
+                para.appendChild(line);
+            case 1:
+                var line = document.createElement("td");
+                var node = document.createTextNode("23-29/51.1%-64.4%");
+                line.appendChild(node);
+                para.appendChild(line);
+            case 2:
+                var line = document.createElement("td");
+                var node = document.createTextNode("30-36/66.7%-80%");
+                line.appendChild(node);
+                para.appendChild(line);
+            case 3:
+                var line = document.createElement("td");
+                var node = document.createTextNode("37-45/82.2%-100%");
+                line.appendChild(node);
+                para.appendChild(line);                                                                                                                                    
+        }
+        var line = document.createElement("td");
+        var output_str = "";
+        if (appraisal_result[1]){
+            output_str = output_str + "Atk" + ", ";
+        }
+        if (appraisal_result[2]){
+            output_str = output_str + "Def" + ", ";
+        }
+        if (appraisal_result[3]){
+            output_str = output_str + "Sta" + ", ";
+        }   
+        output_str = output_str.substring(0, output_str.length-2);                                                                   
+        var node = document.createTextNode(output_str);
+        line.appendChild(node);
+        para.appendChild(line); 
+        switch (appraisal_result[4]) {
+            case 0:
+                var line = document.createElement("td");
+                var node = document.createTextNode("0-7");
+                line.appendChild(node);
+                para.appendChild(line);
+            case 1:
+                var line = document.createElement("td");
+                var node = document.createTextNode("8-12");
+                line.appendChild(node);
+                para.appendChild(line);
+            case 2:
+                var line = document.createElement("td");
+                var node = document.createTextNode("13,14");
+                line.appendChild(node);
+                para.appendChild(line);
+            case 3:
+                var line = document.createElement("td");
+                var node = document.createTextNode("15");
+                line.appendChild(node);
+                para.appendChild(line);                                                                                                                                    
+        }
+        summarized_result.appendChild(para);
     }
     
     function show_compact_list() {
