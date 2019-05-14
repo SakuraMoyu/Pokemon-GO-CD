@@ -261,7 +261,9 @@
 
 <p id="expected_value" style="visibility:hidden;"/>
 
-<button type="button" id="tldr_button" onclick="show_compact_list()" style="visibility:hidden;">Show Compact List</button>
+<form id="compact_table" style="visibility:hidden;">
+    <button type="button" onclick="show_compact_list()">Show Compact List</button>
+</form>
 
 <table id="summarized_result" style="display:none;">
 </table>
@@ -384,6 +386,8 @@
     var max_cp = [];
     var actual_bound = 0;
     
+    var candidate_cp = [];
+    
     var result_table = document.getElementById("result");
     
     var no_of_combination = 0;
@@ -397,7 +401,7 @@
     
     var expected_value_text = document.getElementById("expected_value");
     
-    var tldr_button = document.getElementById("tldr_button");
+    var compact_table = document.getElementById("compact_table");
     var summarized_result = document.getElementById("summarized_result");
     
     var result_table = document.getElementById("result");
@@ -472,6 +476,7 @@
         expected_value_friend = 0;
         expected_value_lucky = 0;
         result_table.innerHTML = "";
+        summarized_result.innerHTML = "";
         pokemon_entry_no = parseInt(species.value);
         var go_base_stat = go_msg_stat_conversion(pokemon_entry_no);
         var constrain_tensor = generate_constrain_matrix();  
@@ -491,7 +496,7 @@
         expected_value_message = expected_value_message + "Expected no of lucky trade to get one candidate " + pokemon_namelist[pokemon_entry_no] + ": " + expected_value_lucky + "<br/>";
         expected_value_text.innerHTML = expected_value_message;
         expected_value_text.style.visibility = "visible";
-        tldr_button.style.visibility = "visible";
+        compact_table.style.visibility = "visible";
         return;
     } 
     
@@ -707,89 +712,9 @@
     }
     
     function table_generation(go_base_stat, cp_iv_hash_map, constrain_accuracy, mode) {
-        var para = document.createElement("tr");
-        var line = document.createElement("th");
-        var node;
-        switch (mode) {
-            case 0:
-                node = document.createTextNode("CP List with CP value seen");
-                break;
-            case 1:
-                node = document.createTextNode("CP List with HP, power up dust cost seen");
-                break;
-            case 2:
-                node = document.createTextNode("CP List with appraisal seen");
-                break;
-            case 3:
-                node = document.createTextNode("CP List with level known");
-                break;
-        }
-        line.appendChild(node);
-        para.appendChild(line);
-        result_table.appendChild(para);
-        var para = document.createElement("tr");
-        switch (mode) {            
-            case 3:            
-                var line = document.createElement("th");
-                node = document.createTextNode("Level");
-                line.appendChild(node);
-                para.appendChild(line);
-                var line = document.createElement("th");
-                node = document.createTextNode("Max CP");
-                line.appendChild(node);
-                para.appendChild(line);                
-            case 2:  
-                var line = document.createElement("th");
-                node = document.createTextNode("Attack IV");
-                line.appendChild(node);    
-                para.appendChild(line);
-                var line = document.createElement("th");
-                node = document.createTextNode("Defense IV");
-                line.appendChild(node);
-                para.appendChild(line);
-                var line = document.createElement("th");
-                node = document.createTextNode("Stamina IV");
-                line.appendChild(node);  
-                para.appendChild(line);         
-                var line = document.createElement("th");
-                node = document.createTextNode("CP Value of next power up");
-                line.appendChild(node);
-                para.appendChild(line);
-                var line = document.createElement("th");
-                node = document.createTextNode("CP Value after 2 power up");
-                line.appendChild(node);  
-                para.appendChild(line);                            
-            case 1:
-                var line = document.createElement("th");
-                node = document.createTextNode("Power Up Cost");
-                line.appendChild(node);  
-                para.appendChild(line);   
-                var line = document.createElement("th");
-                node = document.createTextNode("HP");
-                line.appendChild(node); 
-                para.appendChild(line);                                                                                  
-            case 0:
-                var line = document.createElement("th");
-                node = document.createTextNode("CP Value");
-                line.appendChild(node);
-                para.appendChild(line);
-                var line = document.createElement("th");
-                node = document.createTextNode("True Positive");
-                line.appendChild(node);    
-                para.appendChild(line);
-                var line = document.createElement("th");
-                node = document.createTextNode("Total number of combination");
-                line.appendChild(node);
-                para.appendChild(line);
-                var line = document.createElement("th");
-                node = document.createTextNode("Accuracy");
-                line.appendChild(node);                 
-            default:
-                para.appendChild(line);
-                result_table.appendChild(para);
-                break;
-        }
-        for (var cp = 0; cp < 4000; ++cp){
+        write_table_header(mode);
+        write_summarized_table_header(mode);
+        for (var cp = 0; cp < 5000; ++cp){
             if (typeof cp_iv_hash_map[cp] == 'undefined') {
                 continue;
             }
@@ -803,6 +728,7 @@
                     }
                     var accuracy = true_positive*100/cp_iv_hash_map[cp].length;
                     if (accuracy > constrain_accuracy) {
+                        candidate_cp.push(cp);
                         var data = [cp, true_positive, cp_iv_hash_map[cp].length, accuracy];
                         generate_table_row(data, mode);
                     }
@@ -901,8 +827,139 @@
                     break;                                                                                  
             }
         }
+        generate_summarized_table([candidate_cp], mode);
         return;
     }
+    
+    function write_table_header(mode) {
+        var para = document.createElement("tr");
+        var line = document.createElement("th");
+        var node;
+        switch (mode) {
+            case 0:
+                node = document.createTextNode("CP List with CP value seen");
+                break;
+            case 1:
+                node = document.createTextNode("CP List with HP, power up dust cost seen");
+                break;
+            case 2:
+                node = document.createTextNode("CP List with appraisal seen");
+                break;
+            case 3:
+                node = document.createTextNode("CP List with level known");
+                break;
+        }
+        line.appendChild(node);
+        para.appendChild(line);
+        result_table.appendChild(para);
+        var para = document.createElement("tr");
+        switch (mode) {            
+            case 3:            
+                var line = document.createElement("th");
+                node = document.createTextNode("Level");
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("Max CP");
+                line.appendChild(node);
+                para.appendChild(line);                
+            case 2:  
+                var line = document.createElement("th");
+                node = document.createTextNode("Attack IV");
+                line.appendChild(node);    
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("Defense IV");
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("Stamina IV");
+                line.appendChild(node);  
+                para.appendChild(line);         
+                var line = document.createElement("th");
+                node = document.createTextNode("CP Value of next power up");
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("CP Value after 2 power up");
+                line.appendChild(node);  
+                para.appendChild(line);                            
+            case 1:
+                var line = document.createElement("th");
+                node = document.createTextNode("Power Up Cost");
+                line.appendChild(node);  
+                para.appendChild(line);   
+                var line = document.createElement("th");
+                node = document.createTextNode("HP");
+                line.appendChild(node); 
+                para.appendChild(line);                                                                                  
+            case 0:
+                var line = document.createElement("th");
+                node = document.createTextNode("CP Value");
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("True Positive");
+                line.appendChild(node);    
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("Total number of combination");
+                line.appendChild(node);
+                para.appendChild(line);
+                var line = document.createElement("th");
+                node = document.createTextNode("Accuracy");
+                line.appendChild(node);                 
+            default:
+                para.appendChild(line);
+                result_table.appendChild(para);
+                break;
+        }
+    }
+    
+    function write_summarized_table_header(mode) {
+        var para = document.createElement("tr");
+        var line = document.createElement("th");
+        var node;
+        switch (mode) {
+            case 0:
+                node = document.createTextNode("CP Range with CP value seen");
+                break;
+            case 1:
+                node = document.createTextNode("CP and HP Range with HP, power up dust cost seen");
+                break;
+            case 2:
+                node = document.createTextNode("CP and HP Range with appraisal seen");
+                break;
+            case 3:
+                node = document.createTextNode("CP and HP Range with level known");
+                break;
+        }
+        line.appendChild(node);
+        para.appendChild(line);
+        summarized_result.appendChild(para);
+        var para = document.createElement("tr");
+        switch (mode) {            
+            case 3:            
+            case 2:                         
+            case 1:
+                var line = document.createElement("th");
+                node = document.createTextNode("Power Up Cost");
+                line.appendChild(node);  
+                para.appendChild(line);   
+                var line = document.createElement("th");
+                node = document.createTextNode("HP Value");
+                line.appendChild(node); 
+                para.appendChild(line);                                                                                  
+            case 0:
+                var line = document.createElement("th");
+                node = document.createTextNode("CP Range");
+                line.appendChild(node);          
+            default:
+                para.appendChild(line);
+                summarized_result.appendChild(para);
+                break;
+        }
+    }    
     
     function generate_table_row(data, mode) {
         var para = document.createElement("tr");
@@ -969,6 +1026,46 @@
                 break;
         }        
          return;   
+    }
+    
+    function generate_summarized_table(data, mode) {
+        switch (mode) {
+            case 3:                        
+            case 2:                          
+            case 1:
+                break;                                                                                  
+            case 0:
+                var candidate_cp = data[0];
+                var lower_bound = candidate_cp[0];
+                var higher_bound = candidate_cp[0];
+                for (var count = 1; count < candidate_cp.length; ++count){
+                    var cp = candidate_cp[count];
+                    if (higher_bound != (cp-1)) {
+                        var para = document.createElement("tr");
+                        var line = document.createElement("td");
+                        var output_str = "" + lower_bound + "-" + higher_bound;
+                        var node = document.createTextNode(output_str);
+                        line.appendChild(node);
+                        para.appendChild(line);
+                        summarized_result.appendChild(para); 
+                        lower_bound = candidate_cp[count];
+                        higher_bound = candidate_cp[count];
+                    } else {
+                        higher_bound = cp;
+                    }
+                }
+                var para = document.createElement("tr");
+                var line = document.createElement("td");
+                var output_str = "" + lower_bound + "-" + higher_bound;
+                var node = document.createTextNode(output_str);
+                line.appendChild(node);
+                para.appendChild(line);
+                summarized_result.appendChild(para); 
+                break;
+            default:
+                break;
+        }        
+         return; 
     }
     
     function show_compact_list() {
