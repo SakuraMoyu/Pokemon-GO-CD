@@ -14,6 +14,8 @@ The calculation result will shown at the bottom, you can copy the table to excel
 
 You may also click the "Show Compact List" button to get the summarized information of the data.
 
+Predicted appraisal result is also shown in summarized information.
+
 
 
 How to interpret the data generated:
