@@ -36,6 +36,35 @@
                 </select>
             </td>
         </tr>
+        <tr>
+            <th>
+                <p>Custom stats:</p>
+            </th>
+        </tr>        
+        <tr>
+            <td>
+                <p>Base Attack:</p>
+            </td>
+            <td>
+                <input size="3" maxlength="3" value="0" type="number" min="1" max="999" id="go_base_atk" style="width: 60px;">
+            </td>                    
+        </tr>
+        <tr>
+            <td>
+                <p>Base Defense:</p>
+            </td>
+            <td>
+                <input size="3" maxlength="3" value="0" type="number" min="1" max="999" id="go_base_def" style="width: 60px;">
+            </td>                     
+        </tr>        
+        <tr>   
+            <td>
+                <p>Base Stamina:</p>
+            </td>
+            <td>
+                <input size="3" maxlength="3" value="0" type="number" min="1" max="999" id="go_base_sta" style="width: 60px;">
+            </td>                     
+        </tr>        
         <br/>
         <tr>
             <th>
@@ -356,7 +385,21 @@
 0.787473578,
 0.79030001]
 
-    var species = document.getElementById("species");
+    var species = document.getElementById("species"),
+    
+    go_base_stat_cal = function () {
+        pokemon_entry_no = parseInt(species.value);
+        var go_base_stat = go_msg_stat_conversion(pokemon_entry_no);
+        go_base_atk.value = go_base_stat[1];
+        go_base_def.value = go_base_stat[2];
+        go_base_sta.value = go_base_stat[0];
+    };
+
+    species.addEventListener('change', go_base_stat_cal);
+    
+    var base_atk_box = document.getElementById("go_base_atk");
+    var base_def_box = document.getElementById("go_base_def");
+    var base_sta_box = document.getElementById("go_base_sta"); 
     
     var attack_equality = document.getElementById("atk_range");
     var attack_iv = document.getElementById("atk_iv");
@@ -443,10 +486,9 @@
         };
         // start reading the file. When it is done, calls the onload event defined above.
         reader.readAsBinaryString(fileInput.files[0]);
-    };
-
-    fileInput.addEventListener('change', readFile);
+    };   
     
+    fileInput.addEventListener('change', readFile);    
 
     cp_slider_visualize.innerHTML = cp_slider.value;
     cp_slider.oninput = function() {
@@ -482,8 +524,9 @@
         expected_value_lucky = 0;
         result_table.innerHTML = "";
         summarized_result.innerHTML = "";
-        pokemon_entry_no = parseInt(species.value);
-        var go_base_stat = go_msg_stat_conversion(pokemon_entry_no);
+        var pokemon_entry_no = parseInt(species.value);
+        var go_base_stat = [parseInt(go_base_sta.value), parseInt(go_base_atk.value), parseInt(go_base_def.value)];
+        //go_base_stat = go_msg_stat_conversion(pokemon_entry_no);
         var constrain_tensor = generate_constrain_matrix();  
         var cp_iv_hash_map = go_cp_calculation(go_base_stat, constrain_tensor);
         table_generation(go_base_stat, cp_iv_hash_map, cp_slider.value, 0);
@@ -795,7 +838,9 @@
                                                 }
                                                 candidate_cp[candidate[1]][candidate[5]].push([cp, candidate[1], candidate[5]]);
                                                 var data = [cp, true_positive, no_of_crash, accuracy, candidate[1], candidate[5]];
-                                                generate_table_row(data, mode);
+                                                if (candidate_no == 0) {
+                                                    generate_table_row(data, mode);
+                                                }
                                                 break;
                                             case 2:
                                                 if (typeof candidate_cp[candidate[1]] == 'undefined') {
@@ -823,9 +868,6 @@
                                                 var data = [cp, true_positive, no_of_crash, accuracy, candidate[1], candidate[5], candidate[2], candidate[3], candidate[4], power_up_once, power_up_twice, (candidate[0]+1), max_cp[candidate[0]]];
                                                 generate_table_row(data, mode);
                                                 break;
-                                        }
-                                        if (mode == 1){
-                                            break;
                                         }
                                     }
                                 }
