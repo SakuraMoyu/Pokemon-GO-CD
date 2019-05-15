@@ -554,6 +554,10 @@ Here is the search string for your IV criteria:
         var go_base_stat = [parseInt(go_base_sta.value), parseInt(go_base_atk.value), parseInt(go_base_def.value)];
         //go_base_stat = go_msg_stat_conversion(pokemon_entry_no);
         var constrain_tensor = generate_constrain_matrix();  
+        if (no_of_combination == 0) {
+            alert("No target IV can be generated, please check if the IVs constrains are contradicting with each others.");
+            return;
+        }
         var cp_iv_hash_map = go_cp_calculation(go_base_stat, constrain_tensor);
         table_generation(go_base_stat, cp_iv_hash_map, cp_slider.value, 0);
         table_generation(go_base_stat, cp_iv_hash_map, summary_slider.value, 1);
@@ -561,13 +565,37 @@ Here is the search string for your IV criteria:
         table_generation(go_base_stat, cp_iv_hash_map, level_slider.value, 3);
         result_table.style.visibility = "visible";
         expected_value = Math.ceil(4096/no_of_combination);
-        expected_value_weather = Math.ceil(1728/no_of_combination_weather);
-        expected_value_friend = Math.ceil(1331/no_of_combination_friend);
-        expected_value_lucky = Math.ceil(64/no_of_combination_friend);
+        if (no_of_combination_weather == 0) {
+            expected_value_weather = false;
+        } else {
+            expected_value_weather = Math.ceil(1728/no_of_combination_weather);
+        }
+        if (no_of_combination_friend == 0) {
+            expected_value_friend = false;
+        } else {
+            expected_value_friend = Math.ceil(1331/no_of_combination_friend);
+        }
+        if (no_of_combination_lucky == 0) {
+            expected_value_lucky = false;
+        } else {
+            expected_value_lucky = Math.ceil(64/no_of_combination_lucky);
+        }        
         var expected_value_message = "Expected no of catch needed to get one candidate " + pokemon_namelist[pokemon_entry_no] + " without weather boost: " + expected_value + "<br/>";
-        expected_value_message = expected_value_message + "Expected no of catch needed to get one candidate " + pokemon_namelist[pokemon_entry_no] + " with weather boost: " + expected_value_weather + "<br/>";
-        expected_value_message = expected_value_message + "Expected no of trade with best friend to get one candidate " + pokemon_namelist[pokemon_entry_no] + ": " + expected_value_friend + "<br/>";
-        expected_value_message = expected_value_message + "Expected no of lucky trade to get one candidate " + pokemon_namelist[pokemon_entry_no] + ": " + expected_value_lucky + "<br/>";
+        if (expected_value_weather) {
+            expected_value_message = expected_value_message + "Expected no of catch needed to get one candidate " + pokemon_namelist[pokemon_entry_no] + " with weather boost: " + expected_value_weather + "<br/>";
+        } else {
+            expected_value_message = "No " + pokemon_namelist[pokemon_entry_no] + " shown in weather boost will meet the criteria. Please try again with different settings <br/>";
+        }
+        if (expected_value_friend) {
+            expected_value_message = expected_value_message + "Expected no of trade with best friend to get one candidate " + pokemon_namelist[pokemon_entry_no] + ": " + expected_value_friend + "<br/>";
+        } else {
+            expected_value_message = "No " + pokemon_namelist[pokemon_entry_no] + " received from your best friend will meet the criteria. Please try again with different settings <br/>";
+        }        
+        if (expected_value_lucky) {
+            expected_value_message = expected_value_message + "Expected no of lucky trade to get one candidate " + pokemon_namelist[pokemon_entry_no] + ": " + expected_value_lucky + "<br/>";
+        } else {
+            expected_value_message = "No " + pokemon_namelist[pokemon_entry_no] + " received from lucky trade will meet the criteria. Please try again with different settings <br/>";
+        }
         expected_value_text.innerHTML = expected_value_message;
         expected_value_text.style.visibility = "visible";
         compact_table.style.visibility = "visible";
@@ -695,20 +723,32 @@ Here is the search string for your IV criteria:
                                 break;                
                         }
                     }
-                    if (appraisal_constrain > -1) {
-                        if ((iv_total < 23)&&(appraisal_constrain != 0)) {
-                            constrain_list[hp] = false;
-                            continue;
-                        } else if ((iv_total < 30)&&(appraisal_constrain != 1)) {
-                            constrain_list[hp] = false;
-                            continue;
-                        } else if ((iv_total < 37)&&(appraisal_constrain != 2)) {
-                            constrain_list[hp] = false;
-                            continue;
-                        } else if (appraisal_constrain != 3) {
-                            constrain_list[hp] = false;
-                            continue;
-                        } 
+                    switch (appraisal_constrain) {
+                        case 0:
+                            if (22 < iv_total) {
+                                constrain_list[hp] = false;
+                                continue;
+                            }
+                            break;
+                        case 1:
+                            if ((29 < iv_total)||(iv_total < 23)) {
+                                constrain_list[hp] = false;
+                                continue;
+                            }
+                            break;
+                        case 2:
+                            if ((36 < iv_total)||(iv_total < 30)) {
+                                constrain_list[hp] = false;
+                                continue;
+                            }
+                            break;
+                        case 3:
+                            if (iv_total < 37) {
+                                constrain_list[hp] = false;
+                                continue;
+                            }
+                            break;                                                                           
+                    
                     }
                     constrain_list[hp] = true;
                     ++no_of_combination;                      
