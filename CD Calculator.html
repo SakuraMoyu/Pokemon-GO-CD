@@ -297,6 +297,10 @@
 <table id="summarized_result" style="display:none;">
 </table>
 
+<p id="search_string" style="display:none;">
+Here is the search string for your IV criteria: 
+</p>
+
 <table id="result" style="visibility:hidden;">
 </table>
 
@@ -305,6 +309,7 @@
     var pokemon_stat_array;
     var pokemon_stat_row;
     var pokemon_namelist;
+    var pokedex;
     var cpm = [0.094,
 0.135137432,
 0.16639787,
@@ -447,6 +452,8 @@
     var compact_table = document.getElementById("compact_table");
     var summarized_result = document.getElementById("summarized_result");
     
+    var search_string = document.getElementById("search_string");
+    
     var result_table = document.getElementById("result");
     
     var melmetal = 0;
@@ -457,18 +464,20 @@
         var reader = new FileReader();
         reader.onload = function () {
             pokemon_stat_array = [];
-            pokemon_namelist = []
+            pokemon_namelist = [];
+            pokedex = [];
             pokemon_stat_table = reader.result.split('\n');
             //Here we expect the first line is titles of columns
             for (var count = 1; count < pokemon_stat_table.length; ++count){
                 pokemon_stat = pokemon_stat_table[count].split(','); 
                 pokemon_stat_row = [];
-                pokemon_namelist[count-1] = pokemon_stat[0];
+                pokedex[count-1] = pokemon_stat[0];
+                pokemon_namelist[count-1] = pokemon_stat[1];
                 if (pokemon_stat[0] == "Melmetal") {
                     melmetal = count-1;
                 }
-                for (var count_nested = 1; count_nested < pokemon_stat.length; ++count_nested){        
-                    pokemon_stat_row[count_nested-1] = parseInt(pokemon_stat[count_nested]);                    
+                for (var count_nested = 2; count_nested < pokemon_stat.length; ++count_nested){        
+                    pokemon_stat_row[count_nested-2] = parseInt(pokemon_stat[count_nested]);                    
                 }
                 pokemon_stat_array[count-1] = pokemon_stat_row;
     	    }
@@ -524,6 +533,7 @@
         expected_value_lucky = 0;
         result_table.innerHTML = "";
         summarized_result.innerHTML = "";
+        search_string.innerHTML = "";
         var pokemon_entry_no = parseInt(species.value);
         var go_base_stat = [parseInt(go_base_sta.value), parseInt(go_base_atk.value), parseInt(go_base_def.value)];
         //go_base_stat = go_msg_stat_conversion(pokemon_entry_no);
@@ -828,17 +838,17 @@
                                         var power_up_twice = Math.max(10, Math.floor((go_base_stat[1]+candidate[2])*Math.sqrt(go_base_stat[2]+candidate[3])*Math.sqrt(go_base_stat[0]+candidate[4])*Math.pow(cpm[candidate[0]*2+2],2)/10));
                                         switch (mode) {
                                             case 1:
-                                                if (typeof candidate_cp[candidate[1]] == 'undefined') {
-                                                    candidate_cp[candidate[1]] = [];
-                                                    candidate_cp[candidate[1]][candidate[5]] = [];
-                                                } else {
-                                                    if (typeof candidate_cp[candidate[1]][candidate[5]] == 'undefined') {
-                                                        candidate_cp[candidate[1]][candidate[5]] = [];
-                                                    }                                               
-                                                }
-                                                candidate_cp[candidate[1]][candidate[5]].push([cp, candidate[1], candidate[5]]);
-                                                var data = [cp, true_positive, no_of_crash, accuracy, candidate[1], candidate[5]];
                                                 if (candidate_no == 0) {
+                                                    if (typeof candidate_cp[candidate[1]] == 'undefined') {
+                                                        candidate_cp[candidate[1]] = [];
+                                                        candidate_cp[candidate[1]][candidate[5]] = [];
+                                                    } else {
+                                                        if (typeof candidate_cp[candidate[1]][candidate[5]] == 'undefined') {
+                                                            candidate_cp[candidate[1]][candidate[5]] = [];
+                                                        }                                               
+                                                    }
+                                                    candidate_cp[candidate[1]][candidate[5]].push([cp, candidate[1], candidate[5]]);
+                                                    var data = [cp, true_positive, no_of_crash, accuracy, candidate[1], candidate[5]];          
                                                     generate_table_row(data, mode);
                                                 }
                                                 break;
@@ -878,6 +888,9 @@
             }
         }
         generate_summarized_table(candidate_cp, mode);
+        if (mode == 1){
+            generate_search_string(candidate_cp);
+        }
         return;
     }
     
@@ -1147,8 +1160,12 @@
                 }
                 var para = document.createElement("tr");
                 var line = document.createElement("td");
-                var output_str = "" + lower_bound + "-" + higher_bound;
-                var node = document.createTextNode(output_str);
+                if (lower_bound == higher_bound){
+                    node = document.createTextNode(lower_bound);
+                } else {
+                    var output_str = "" + lower_bound + "-" + higher_bound;
+                    node = document.createTextNode(output_str);
+                }
                 line.appendChild(node);
                 para.appendChild(line);
                 summarized_result.appendChild(para); 
@@ -1490,7 +1507,134 @@
     
     function show_compact_list() {
         summarized_result.style.display = "block";
+        search_string.style.display = "block";
         return;
+    }
+    
+    function generate_search_string(data) {
+        var pokemon_entry_no = parseInt(species.value);
+        var dex_number = pokedex[pokemon_entry_no];
+        var candidate_cp = data;
+        var hp_only = [];
+        for (var count = 0; count < power_up_cost.length; ++count){
+            var dust_level = power_up_cost[count];
+            for (var hp = 1; hp < 1000; ++hp){
+                if (typeof candidate_cp[dust_level][hp] == 'undefined') {
+                    continue;
+                } else {
+                    for (var count_inner = 0; count_inner < candidate_cp[dust_level][hp].length; ++count_inner){
+                        var candidate_sublist = candidate_cp[dust_level][hp][count_inner];
+                        if (typeof hp_only[hp] == 'undefined') {
+                            hp_only[hp] = [];
+                        }
+                        hp_only[hp].push(candidate_sublist);
+                    }
+                }
+            }
+        }
+        data = [];
+        for (var hp = 1; hp < 1000; ++hp){ 
+            if (typeof hp_only[hp] == 'undefined') {
+                continue;
+            } else {
+                var cp_list = [];
+                for (var count = 0; count < hp_only[hp].length; ++count){
+                    cp_list[hp_only[hp][count][0]] = true;
+                }
+                hp_only[hp] = cp_list;
+            }
+        }
+        var all_checked = true;
+        while (true) {
+            all_checked = true;
+            var hp_candidate = [];
+            var cp_candidate = [];
+            for (var hp = 1; hp < 1000; ++hp){
+                if (typeof hp_only[hp] == 'undefined') {
+                    continue;
+                } else {
+                    if (hp_only[hp].length == 0) {
+                        continue;
+                    } else {
+                        all_checked = false;
+                        var cp_list = hp_only[hp];
+                        var overlap = false;
+                        for (count = 1; count < 4000; ++count){
+                            if (cp_list[count] && cp_candidate[count]) {
+                                overlap = true;
+                            }
+                        }
+                        if (overlap) {
+                            continue;
+                        } else {
+                            for (count = 1; count < 4000; ++count){
+                                if (cp_list[count]) {
+                                    cp_candidate[count] = true;
+                                }
+                            } 
+                            hp_candidate.push(hp);
+                        } 
+                        hp_only[hp] = [];     
+                    }             
+                }
+            }
+            if (all_checked) {
+                break;
+            }
+            search_string.innerHTML = search_string.innerHTML + dex_number + "&";
+            var lower_bound = hp_candidate[0];
+            var higher_bound = hp_candidate[0]; 
+            for (var count = 1; count < hp_candidate.length; ++count){
+                var hp = hp_candidate[count];
+                if (higher_bound < (hp-1)) {
+                    if (lower_bound == higher_bound){
+                        search_string.innerHTML = search_string.innerHTML + "HP" + lower_bound + ",";
+                    } else {
+                        search_string.innerHTML = search_string.innerHTML + "HP" + lower_bound + "-" + higher_bound + ",";
+                    }
+                    lower_bound = hp;
+                    higher_bound = hp;
+                } else {
+                    higher_bound = hp;
+                }
+            } 
+            if (lower_bound == higher_bound){
+                search_string.innerHTML = search_string.innerHTML + "HP" + lower_bound + "&";
+            } else {
+                search_string.innerHTML = search_string.innerHTML + "HP" + lower_bound + "-" + higher_bound + "&";
+            }
+            
+            var lower_bound = -1;
+            var higher_bound = 10;
+            for (var cp = 10; cp < 5000; ++cp){
+                if (cp_candidate[cp]) {
+                    higher_bound = cp;
+                    if (lower_bound == -1) {
+                        lower_bound = cp;
+                    } 
+                } else {
+                    if (lower_bound > 0) {
+                        if (lower_bound == higher_bound){
+                            search_string.innerHTML = search_string.innerHTML + "CP" + lower_bound + ",";
+                        } else {
+                            search_string.innerHTML = search_string.innerHTML + "CP" + lower_bound + "-" + higher_bound + ",";
+                        }
+                        lower_bound = -1;
+                    }
+                }
+            } 
+            if (lower_bound > 0) {
+                if (lower_bound == higher_bound){
+                    search_string.innerHTML = search_string.innerHTML + "CP" + lower_bound;
+                } else {
+                    search_string.innerHTML = search_string.innerHTML + "CP" + lower_bound + "-" + higher_bound;
+                }
+                lower_bound = -1;
+            } else {
+                search_string.innerHTML = search_string.innerHTML.substring(0, search_string.innerHTML.length-1);
+            }
+            search_string.innerHTML = search_string.innerHTML + "<br/> <br/>"; 
+        }  
     }
     
     
