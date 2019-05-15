@@ -22,9 +22,15 @@ You may also click the "Show Compact List" button to get the summarized informat
 
 Predicted appraisal result is also shown in summarized information.
 
+Search string for the target IV range is now added at the bottom of the Compact List. Note that since only information about CP and HP can be used on search string its accuracy will be at the middle between "CP known" and "CP, HP and power up dust cost known".
+
+Search string will split if the criteron overlap to each other which will generate more unwanted false positive.
+
 Try not to set loose constrain on IV or it may not have enough memory to work with......
 
 Result from a sample run of calculator was added as "Torchic Sample Run.xlsx", the configuation is (Atk IV >= 14, Def IV >= 11, Sta IV >= 11 and overall IV >= 40) with all accuracy set as 0%
+
+Result of search string from sample run will same settings as above is added as "Torchic Sample Run.txt" as reference.
 
 How to interpret the data generated:
 
