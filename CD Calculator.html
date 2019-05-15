@@ -406,6 +406,8 @@
     
     var result_table = document.getElementById("result");
     
+    var melmetal = 0;
+    
     var fileInput = document.getElementById("csv"),
 
     readFile = function () {
@@ -419,6 +421,9 @@
                 pokemon_stat = pokemon_stat_table[count].split(','); 
                 pokemon_stat_row = [];
                 pokemon_namelist[count-1] = pokemon_stat[0];
+                if (pokemon_stat[0] == "Melmetal") {
+                    melmetal = count-1;
+                }
                 for (var count_nested = 1; count_nested < pokemon_stat.length; ++count_nested){        
                     pokemon_stat_row[count_nested-1] = parseInt(pokemon_stat[count_nested]);                    
                 }
@@ -517,6 +522,9 @@
             var circle_9_nerf_attack = Math.round(mixed_attack*speedmod*0.91);
             var circle_9_nerf_defense = Math.round(mixed_defense*speedmod*0.91);
             var circle_9_nerf_hp = Math.round((50+1.75*msg_stat[0])*0.91);
+            if (pokemon_entry_no == melmetal) {
+                circle_9_nerf_hp = 264;
+            }
             var go_base_stat = [circle_9_nerf_hp, circle_9_nerf_attack, circle_9_nerf_defense];
             return go_base_stat;
         }
@@ -734,9 +742,9 @@
                         generate_table_row(data, mode);
                     }
                     break; 
+                case 1:
                 case 2: 
                 case 3:                    
-                case 1:  
                     var checked = [];                              
                     for (var crash = 0; crash < cp_iv_hash_map[cp].length; ++crash){
                         var stat = [];
@@ -815,6 +823,9 @@
                                                 var data = [cp, true_positive, no_of_crash, accuracy, candidate[1], candidate[5], candidate[2], candidate[3], candidate[4], power_up_once, power_up_twice, (candidate[0]+1), max_cp[candidate[0]]];
                                                 generate_table_row(data, mode);
                                                 break;
+                                        }
+                                        if (mode == 1){
+                                            break;
                                         }
                                     }
                                 }
