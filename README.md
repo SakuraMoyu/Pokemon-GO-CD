@@ -26,6 +26,8 @@ Search string for the target IV range is now added at the bottom of the Compact 
 
 Search string will split if the criteron overlap to each other which will generate more unwanted false positive.
 
+In regard to the search function in app being able to accept long search string or not, the only information I have is the app do show some pokemons out with those long strings, but it is not known that if the result do contain all candidates as specified in the string.
+
 Try not to set loose constrain on IV or it may not have enough memory to work with......
 
 Result from a sample run of calculator was added as "Torchic Sample Run.xlsx", the configuation is (Atk IV >= 14, Def IV >= 11, Sta IV >= 11 and overall IV >= 40) with all accuracy set as 0%
