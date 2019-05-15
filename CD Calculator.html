@@ -584,17 +584,17 @@ Here is the search string for your IV criteria:
         if (expected_value_weather) {
             expected_value_message = expected_value_message + "Expected no of catch needed to get one candidate " + pokemon_namelist[pokemon_entry_no] + " with weather boost: " + expected_value_weather + "<br/>";
         } else {
-            expected_value_message = "No " + pokemon_namelist[pokemon_entry_no] + " shown in weather boost will meet the criteria. Please try again with different settings <br/>";
+            expected_value_message = expected_value_message + "No " + pokemon_namelist[pokemon_entry_no] + " shown in weather boost will meet the criteria. Please try again with different settings. <br/>";
         }
         if (expected_value_friend) {
             expected_value_message = expected_value_message + "Expected no of trade with best friend to get one candidate " + pokemon_namelist[pokemon_entry_no] + ": " + expected_value_friend + "<br/>";
         } else {
-            expected_value_message = "No " + pokemon_namelist[pokemon_entry_no] + " received from your best friend will meet the criteria. Please try again with different settings <br/>";
+            expected_value_message = expected_value_message + "No " + pokemon_namelist[pokemon_entry_no] + " received from your best friend will meet the criteria. Please try again with different settings. <br/>";
         }        
         if (expected_value_lucky) {
             expected_value_message = expected_value_message + "Expected no of lucky trade to get one candidate " + pokemon_namelist[pokemon_entry_no] + ": " + expected_value_lucky + "<br/>";
         } else {
-            expected_value_message = "No " + pokemon_namelist[pokemon_entry_no] + " received from lucky trade will meet the criteria. Please try again with different settings <br/>";
+            expected_value_message = expected_value_message + "No " + pokemon_namelist[pokemon_entry_no] + " received from lucky trade will meet the criteria. Please try again with different settings. <br/>";
         }
         expected_value_text.innerHTML = expected_value_message;
         expected_value_text.style.visibility = "visible";
