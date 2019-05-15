@@ -226,6 +226,20 @@
             </td>
         </tr>
         <tr>
+            <td>
+                <p>Appraisal:</p>
+            </td>
+            <td>
+                <select id="appraisal_range">
+                    <option selected value="-1">Don't care</option>
+                    <option value="0">0-22/0%-48.9%</option>
+                    <option value="1">23-29/51.1%-64.4%</option>
+                    <option value="2">30-36/66.7%-80%</option>
+                    <option value="3">37-45/82.2%-100%</option>                 
+                </select>
+            </td>
+        </tr>        
+        <tr>
             <th>
                 <p>Accuracy:</p>
             </th>
@@ -417,6 +431,8 @@ Here is the search string for your IV criteria:
     
     var sum_equality = document.getElementById("sum_range");
     var sum_iv = document.getElementById("sum_iv");
+    
+    var appraisal_range = document.getElementById("appraisal_range");
 
     var cp_slider = document.getElementById("cp_accuracy");
     var cp_slider_visualize = document.getElementById("cp_accuracy_value");
@@ -587,6 +603,7 @@ Here is the search string for your IV criteria:
         var constrain_tensor = [];
         var sum_constrain = sum_equality.value;
         var sum_bound = parseInt(sum_iv.value);
+        var appraisal_constrain = parseInt(appraisal_range.value);
         for (var atk = 0; atk < 16; ++atk){
             var constrain_matrix = [];
             var atk_bound = parseInt(attack_iv.value);
@@ -677,6 +694,21 @@ Here is the search string for your IV criteria:
                                 }
                                 break;                
                         }
+                    }
+                    if (appraisal_constrain > -1) {
+                        if ((iv_total < 23)&&(appraisal_constrain != 0)) {
+                            constrain_list[hp] = false;
+                            continue;
+                        } else if ((iv_total < 30)&&(appraisal_constrain != 1)) {
+                            constrain_list[hp] = false;
+                            continue;
+                        } else if ((iv_total < 37)&&(appraisal_constrain != 2)) {
+                            constrain_list[hp] = false;
+                            continue;
+                        } else if (appraisal_constrain != 3) {
+                            constrain_list[hp] = false;
+                            continue;
+                        } 
                     }
                     constrain_list[hp] = true;
                     ++no_of_combination;                      
