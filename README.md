@@ -14,6 +14,8 @@ Accuracy means the chance that these information will lead to a pokemon with tar
 
 Note that even though the minimum accuracy is set as 0% the calculator will still ignore cases with none of the IV combination meeting the target(thus the accuacy is 0%), the calculator will only shown cases that comprise with at least 1 target IV combination.
 
+The calculator can now accept an arbitary custom combination of base stats.
+
 The calculation result will shown at the bottom, you can copy the table to excel and do what you want with the data.
 
 You may also click the "Show Compact List" button to get the summarized information of the data.
