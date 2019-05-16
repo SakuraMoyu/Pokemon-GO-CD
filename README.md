@@ -25,6 +25,7 @@ Predicted appraisal result is also shown in summarized information.
 Search string for the target IV range is now added at the bottom of the Compact List. Note that since only information about CP and HP can be used on search string its accuracy will be at the middle between "CP known" and "CP, HP and power up dust cost known".
 
 Search string has been generated in 3 versions:
+
 Compact version will try to squeeze everything in one expression while ignoring probable incompatibility of criterion that will damage precision of search(not recall).
 
 Fine version will split if the criteron overlap to each other which will generate more unwanted false positive. Search result in app by these strings will have higher precision as compact version.
