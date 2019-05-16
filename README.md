@@ -24,7 +24,14 @@ Predicted appraisal result is also shown in summarized information.
 
 Search string for the target IV range is now added at the bottom of the Compact List. Note that since only information about CP and HP can be used on search string its accuracy will be at the middle between "CP known" and "CP, HP and power up dust cost known".
 
-Search string will split if the criteron overlap to each other which will generate more unwanted false positive.
+Search string has been generated in 3 versions:
+Compact version will try to squeeze everything in one expression while ignoring probable incompatibility of criterion that will damage precision of search(not recall).
+
+Fine version will split if the criteron overlap to each other which will generate more unwanted false positive. Search result in app by these strings will have higher precision as compact version.
+
+Last set of strings are fine version will specific level range, so you can ignore low levels pokemon if you think you won't invest on them because of the cost.
+
+Recall from any of these 3 set of search strings is same as the recall of the "CP, HP and power up dust cost known" table, as search string was created by pulling data from this table directly. (Accuracy value shown in table is actually precision, not recall. Precision and recall is always on state of Pareto efficiency)
 
 In regard to the search function in app being able to accept long search string or not, the only information I have is the app do show some pokemons out with those long strings, but it is not known that if the result do contain all candidates as specified in the string.
 
