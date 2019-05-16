@@ -311,9 +311,11 @@
 <table id="summarized_result" style="display:none;">
 </table>
 
-<p id="search_string" style="display:none;">
-Here is the search string for your IV criteria: 
-</p>
+<p id="coarse_search_string" style="display:none;"/>
+
+<p id="fine_search_string" style="display:none;"/>
+ 
+<p id="level_search_string" style="display:none;"/>
 
 <table id="result" style="visibility:hidden;">
 </table>
@@ -468,7 +470,11 @@ Here is the search string for your IV criteria:
     var compact_table = document.getElementById("compact_table");
     var summarized_result = document.getElementById("summarized_result");
     
-    var search_string = document.getElementById("search_string");
+    var coarse_search_string = document.getElementById("coarse_search_string");
+    
+    var fine_search_string = document.getElementById("fine_search_string");
+    
+    var level_search_string = document.getElementById("level_search_string");
     
     var result_table = document.getElementById("result");
     
@@ -549,7 +555,9 @@ Here is the search string for your IV criteria:
         expected_value_lucky = 0;
         result_table.innerHTML = "";
         summarized_result.innerHTML = "";
-        search_string.innerHTML = "";
+        coarse_search_string.innerHTML = "";
+        fine_search_string.innerHTML = "";
+        level_search_string.innerHTML = "";
         var pokemon_entry_no = parseInt(species.value);
         var go_base_stat = [parseInt(go_base_sta.value), parseInt(go_base_atk.value), parseInt(go_base_def.value)];
         //go_base_stat = go_msg_stat_conversion(pokemon_entry_no);
@@ -961,7 +969,22 @@ Here is the search string for your IV criteria:
         }
         generate_summarized_table(candidate_cp, mode);
         if (mode == 1){
-            generate_search_string(candidate_cp);
+            coarse_search_string.innerHTML = "Here is the compact version of search string: <br/>";
+            generate_search_string(candidate_cp, coarse_search_string, false, 0);
+            fine_search_string.innerHTML = "Here is the fine filter version of search string: <br/>";
+            generate_search_string(candidate_cp, fine_search_string, true, 0);
+            level_search_string.innerHTML = level_search_string.innerHTML + "Here is the search string by level range 1-6: <br/>";
+            generate_search_string(candidate_cp.slice(0, 700), level_search_string, true, 0);
+            level_search_string.innerHTML = level_search_string.innerHTML + "Here is the search string by level range 7-12: <br/>";
+            generate_search_string(candidate_cp.slice(700, 1450), level_search_string, true, 700);
+            level_search_string.innerHTML = level_search_string.innerHTML + "Here is the search string by level range 13-18: <br/>";
+            generate_search_string(candidate_cp.slice(1450, 2350), level_search_string, true, 1450);
+            level_search_string.innerHTML = level_search_string.innerHTML + "Here is the search string by level range 19-24: <br/>";
+            generate_search_string(candidate_cp.slice(2350, 3750), level_search_string, true, 2350);
+            level_search_string.innerHTML = level_search_string.innerHTML + "Here is the search string by level range 25-30: <br/>";
+            generate_search_string(candidate_cp.slice(3750, 5500), level_search_string, true, 3750);
+            level_search_string.innerHTML = level_search_string.innerHTML + "Here is the search string by level range 31-35: <br/>";
+            generate_search_string(candidate_cp.slice(5500, 8001), level_search_string, true, 5500);
         }
         return;
     }
@@ -1579,17 +1602,22 @@ Here is the search string for your IV criteria:
     
     function show_compact_list() {
         summarized_result.style.display = "block";
-        search_string.style.display = "block";
+        coarse_search_string.style.display = "block";
+        fine_search_string.style.display = "block";
+        level_search_string.style.display = "block";
         return;
     }
     
-    function generate_search_string(data) {
+    function generate_search_string(data, search_string, fine, start_position) {
         var pokemon_entry_no = parseInt(species.value);
         var dex_number = pokedex[pokemon_entry_no];
         var candidate_cp = data;
         var hp_only = [];
         for (var count = 0; count < power_up_cost.length; ++count){
-            var dust_level = power_up_cost[count];
+            var dust_level = power_up_cost[count] - start_position;
+            if (typeof candidate_cp[dust_level]== 'undefined') {
+                continue;
+            }
             for (var hp = 1; hp < 1000; ++hp){
                 if (typeof candidate_cp[dust_level][hp] == 'undefined') {
                     continue;
@@ -1604,7 +1632,7 @@ Here is the search string for your IV criteria:
                 }
             }
         }
-        data = [];
+        //data = [];
         for (var hp = 1; hp < 1000; ++hp){ 
             if (typeof hp_only[hp] == 'undefined') {
                 continue;
@@ -1636,7 +1664,7 @@ Here is the search string for your IV criteria:
                                 overlap = true;
                             }
                         }
-                        if (overlap) {
+                        if (overlap && fine) {
                             continue;
                         } else {
                             for (count = 1; count < 4000; ++count){
