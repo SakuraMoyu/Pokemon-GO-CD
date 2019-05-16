@@ -30,7 +30,7 @@ Compact version will try to squeeze everything in one expression while ignoring 
 
 Fine version will split if the criteron overlap to each other which will generate more unwanted false positive. Search result in app by these strings will have higher precision as compact version.
 
-Last set of strings are fine version will specific level range, so you can ignore low levels pokemon if you think you won't invest on them because of the cost.
+Last set of strings are fine version with specific level range, so you can ignore low levels pokemon if you think you won't invest on them because of the cost.
 
 Recall from any of these 3 set of search strings is same as the recall of the "CP, HP and power up dust cost known" table, as search string was created by pulling data from this table directly. (Accuracy value shown in table is actually precision, not recall. Precision and recall is always on state of Pareto efficiency)
 
