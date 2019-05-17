@@ -32,13 +32,10 @@ Fine version will split if the criteron overlap to each other which will generat
 
 Search string by level are set of fine version or search strings with specific level range, so you can ignore low levels pokemon if you think you won't invest on them because of the cost.
 
-The last string was inverted string, which show the EXACT complement of the original disjunctive normal form boolean expression for a species. Which means THEORTICALLY it will show all pokemons with HP and CP combination which disagree with your target IVs, and it COULD HAVE the best precision over any search string here. However, for such high precision the search string will inevitably become long, and spliting is not an option as it is showing the complement set which spliting will result in pokemon with good IV will also be shown in at least one of those search result, which is intolerable given how user are intended to use this search string. If you really want to use it while it's too long, try to prune it by HP and add one or two more arguement &!HP{}-HP{} to make sure it's only checking wrong IVs combination on specific HP range.
+The last string was inverted string, which show the EXACT complement of the original disjunctive normal form boolean expression for a species. Which means it will show all pokemons with HP and CP combination which disagree with your target IVs, and it have the best precision over any search string here. However, for such high precision the search string will inevitably become long, so you will need to split the strings to fit on the text replacement function of your phone. Please select an appropriate maximum search string length. 
+Do note that if you use this string you are gonna to mass transfer a lot pokemon which are not your target, so you may not have enough pokemons remains for trading if you would like to consider that.
 
-So TL:DR, if this search string can fit on text replacement function of your device and also be able to use in app properly, go for it, if you are not planning to trade pokemon with unwanted IVs combination for more candies, as this is the best search string here. Otherwise, just forget this string.
-
-
-
-Recall from any of these 3 set of search strings is same as the recall of the "CP, HP and power up dust cost known" table, as search string was created by pulling data from this table directly. (Accuracy value shown in table is actually precision, not recall. Precision and recall is always on state of Pareto efficiency)
+Recall from any of these sets of search strings is same as the recall of the "CP, HP and power up dust cost known" table, as search string was created by pulling data from this table directly. (Accuracy value shown in table is actually precision, not recall. Precision and recall is always on state of Pareto efficiency)
 
 In regard to the search function in app being able to accept long search string or not, the only information I have is the app do show some pokemons out with those long strings, but it is not known that if the result do contain all candidates as specified in the string.
 
@@ -46,7 +43,7 @@ Try not to set loose constrain on IV or it may not have enough memory to work wi
 
 Result from a sample run of calculator was added as "Torchic Sample Run.xlsx", the configuation is (Atk IV >= 14, Def IV >= 11, Sta IV >= 11 and overall IV >= 40) with all accuracy set as 0%
 
-Result of search string from sample run with same settings as above is added as "Torchic Sample Run.txt" as reference.
+Result of search string from sample run with same settings as above and maximum search string length set to 1900 is added as "Torchic Sample Run.txt" as reference.
 
 How to interpret the data generated:
 
