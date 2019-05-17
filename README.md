@@ -24,13 +24,18 @@ Predicted appraisal result is also shown in summarized information.
 
 Search string for the target IV range is now added at the bottom of the Compact List. Note that since only information about CP and HP can be used on search string its accuracy will be at the middle between "CP known" and "CP, HP and power up dust cost known".
 
-Search string has been generated in 3 versions:
+Search string has been generated in 4 versions:
 
 Compact version will try to squeeze everything in one expression while ignoring probable incompatibility of criterion that will damage precision of search(not recall).
 
 Fine version will split if the criteron overlap to each other which will generate more unwanted false positive. Search result in app by these strings will have higher precision as compact version.
 
-Last set of strings are fine version with specific level range, so you can ignore low levels pokemon if you think you won't invest on them because of the cost.
+Search string by level are set of fine version or search strings with specific level range, so you can ignore low levels pokemon if you think you won't invest on them because of the cost.
+
+The last string was inverted string, which show the EXACT complement of the original disjunctive normal form boolean expression for a species. Which means THEORTICALLY it will show all pokemons with HP and CP combination which disagree with your target IVs, and it COULD HAVE the best precision over any search string here. However, for such high precision the search string will inevitably become long, and spliting is not an option as it is showing the complement set which spliting will result in pokemon with good IV will also be shown in at least one of those search result, which is intolerable given how user are intended to use this search string .
+So TL:DR, if this search string can fit on text replacement function of your device and also be able to use in app properly, go for it, if you are not planning to trade pokemon with unwanted IVs combination for more candies, as this is the best search string here. Otherwise, just forget this string.
+
+
 
 Recall from any of these 3 set of search strings is same as the recall of the "CP, HP and power up dust cost known" table, as search string was created by pulling data from this table directly. (Accuracy value shown in table is actually precision, not recall. Precision and recall is always on state of Pareto efficiency)
 
