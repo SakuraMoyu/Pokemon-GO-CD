@@ -317,6 +317,8 @@
  
 <p id="level_search_string" style="display:none;"/>
 
+<p id="inverted_search_string" style="display:none;"/>
+
 <table id="result" style="visibility:hidden;">
 </table>
 
@@ -476,6 +478,8 @@
     
     var level_search_string = document.getElementById("level_search_string");
     
+    var inverted_search_string = document.getElementById("inverted_search_string");
+    
     var result_table = document.getElementById("result");
     
     var melmetal = 0;
@@ -558,6 +562,7 @@
         coarse_search_string.innerHTML = "";
         fine_search_string.innerHTML = "";
         level_search_string.innerHTML = "";
+        inverted_search_string.innerHTML = "";
         var pokemon_entry_no = parseInt(species.value);
         var go_base_stat = [parseInt(go_base_sta.value), parseInt(go_base_atk.value), parseInt(go_base_def.value)];
         //go_base_stat = go_msg_stat_conversion(pokemon_entry_no);
@@ -985,6 +990,8 @@
             generate_search_string(candidate_cp.slice(3750, 5500), level_search_string, true, 3750);
             level_search_string.innerHTML = level_search_string.innerHTML + "Here is the search string by level range 31-35: <br/>";
             generate_search_string(candidate_cp.slice(5500, 8001), level_search_string, true, 5500);
+            inverted_search_string.innerHTML = inverted_search_string.innerHTML + "Here is the inverted search string: <br/>";
+            generate_inverted_search_string(candidate_cp, inverted_search_string)
         }
         return;
     }
@@ -1605,6 +1612,7 @@
         coarse_search_string.style.display = "block";
         fine_search_string.style.display = "block";
         level_search_string.style.display = "block";
+        inverted_search_string.style.display = "block";
         return;
     }
     
@@ -1737,7 +1745,83 @@
         }  
     }
     
-    
+    function generate_inverted_search_string(data, search_string) {
+        var pokemon_entry_no = parseInt(species.value);
+        var dex_number = pokedex[pokemon_entry_no];
+        var candidate_cp = data;
+        var hp_only = [];
+        for (var count = 0; count < power_up_cost.length; ++count){
+            var dust_level = power_up_cost[count];
+            if (typeof candidate_cp[dust_level]== 'undefined') {
+                continue;
+            }
+            for (var hp = 1; hp < 1000; ++hp){
+                if (typeof candidate_cp[dust_level][hp] == 'undefined') {
+                    continue;
+                } else {
+                    for (var count_inner = 0; count_inner < candidate_cp[dust_level][hp].length; ++count_inner){
+                        var candidate_sublist = candidate_cp[dust_level][hp][count_inner];
+                        if (typeof hp_only[hp] == 'undefined') {
+                            hp_only[hp] = [];
+                        }
+                        hp_only[hp].push(candidate_sublist);
+                    }
+                }
+            }
+        }
+        data = [];
+        for (var hp = 1; hp < 1000; ++hp){ 
+            if (typeof hp_only[hp] == 'undefined') {
+                continue;
+            } else {
+                var cp_list = [];
+                for (var count = 0; count < hp_only[hp].length; ++count){
+                    cp_list[hp_only[hp][count][0]] = true;
+                }
+                hp_only[hp] = cp_list;
+            }
+        }       
+
+        search_string.innerHTML = search_string.innerHTML + dex_number;
+        for (var hp = 1; hp < 1000; ++hp){
+            if (typeof hp_only[hp] == 'undefined') {
+                continue;
+            } else {
+                var lower_bound = -1;
+                var higher_bound = 10;
+                for (var cp = 10; cp < 5000; ++cp){                    
+                    if (hp_only[hp][cp]) {
+                        higher_bound = cp;
+                        if (lower_bound == -1) {
+                            lower_bound = cp;
+                        } 
+                    } else {
+                        if (lower_bound > 0) {
+                            if (lower_bound == higher_bound){
+                                search_string.innerHTML = search_string.innerHTML + "&!HP" + hp + ",";
+                                search_string.innerHTML = search_string.innerHTML + "!CP" + lower_bound;
+                            } else {
+                                search_string.innerHTML = search_string.innerHTML + "&!HP" + hp + ",";
+                                search_string.innerHTML = search_string.innerHTML + "!CP" + lower_bound + "-" + higher_bound;
+                            }
+                            lower_bound = -1;
+                        }
+                    }
+                }
+                if (lower_bound > 0) {
+                    if (lower_bound == higher_bound){
+                        search_string.innerHTML = search_string.innerHTML + "&!HP" + hp + ",";
+                        search_string.innerHTML = search_string.innerHTML + "!CP" + lower_bound;
+                    } else {
+                        search_string.innerHTML = search_string.innerHTML + "&!HP" + hp + ",";
+                        search_string.innerHTML = search_string.innerHTML + "!CP" + lower_bound + "-" + higher_bound;
+                    }
+                    lower_bound = -1;
+                } 
+            }
+        }
+        search_string.innerHTML = search_string.innerHTML + "<br/> <br/>"; 
+    }   
     
 </script>
 
