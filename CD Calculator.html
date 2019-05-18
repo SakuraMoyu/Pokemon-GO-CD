@@ -327,6 +327,8 @@
 <p id="coarse_search_string" style="display:none;"/>
 
 <p id="fine_search_string" style="display:none;"/>
+
+<p id="absolute_search_string" style="display:none;"/>
  
 <p id="level_search_string" style="display:none;"/>
 
@@ -489,6 +491,8 @@
     
     var fine_search_string = document.getElementById("fine_search_string");
     
+    var absolute_search_string = document.getElementById("absolute_search_string");
+    
     var level_search_string = document.getElementById("level_search_string");
     
     var inverted_search_string = document.getElementById("inverted_search_string");
@@ -576,6 +580,7 @@
         summarized_result.innerHTML = "";
         coarse_search_string.innerHTML = "";
         fine_search_string.innerHTML = "";
+        absolute_search_string.innerHTML = "";
         level_search_string.innerHTML = "";
         inverted_search_string.innerHTML = "";
         var pokemon_entry_no = parseInt(species.value);
@@ -993,6 +998,8 @@
             generate_search_string(candidate_cp, coarse_search_string, false, 0);
             fine_search_string.innerHTML = "Here is the fine filter version of search string: <br/>";
             generate_search_string(candidate_cp, fine_search_string, true, 0);
+            absolute_search_string.innerHTML = "Here is the absolute version of search string: <br/>";
+            generate_inverted_search_string(candidate_cp, absolute_search_string, true);
             level_search_string.innerHTML = level_search_string.innerHTML + "Here is the search string by level range 1-6: <br/>";
             generate_search_string(candidate_cp.slice(0, 700), level_search_string, true, 0);
             level_search_string.innerHTML = level_search_string.innerHTML + "Here is the search string by level range 7-12: <br/>";
@@ -1006,7 +1013,7 @@
             level_search_string.innerHTML = level_search_string.innerHTML + "Here is the search string by level range 31-35: <br/>";
             generate_search_string(candidate_cp.slice(5500, 8001), level_search_string, true, 5500);
             inverted_search_string.innerHTML = inverted_search_string.innerHTML + "Here is the inverted search string: <br/>";
-            generate_inverted_search_string(candidate_cp, inverted_search_string)
+            generate_inverted_search_string(candidate_cp, inverted_search_string, false);
         }
         return;
     }
@@ -1626,6 +1633,7 @@
         summarized_result.style.display = "block";
         coarse_search_string.style.display = "block";
         fine_search_string.style.display = "block";
+        absolute_search_string.style.display = "block";
         level_search_string.style.display = "block";
         inverted_search_string.style.display = "block";
         return;
@@ -1760,8 +1768,11 @@
         }  
     }
     
-    function generate_inverted_search_string(data, search_string) {
+    function generate_inverted_search_string(data, search_string, double_negate) {
         var max_length = parseInt(string_length.value);
+        if (double_negate) {
+            max_length = max_length - 10;
+        }
         var pokemon_entry_no = parseInt(species.value);
         var dex_number = pokedex[pokemon_entry_no];
         var candidate_cp = data;
@@ -1801,11 +1812,26 @@
         search_string.innerHTML = search_string.innerHTML + dex_number;
         var cuminative_str = "";
         var hp_bound = -1;
+        var hp_lower_bound = 1;
+        var hp_bound_str = "";
         for (var hp = 1; hp < 1000; ++hp){
             var output_str = "";
             if (typeof hp_only[hp] == 'undefined') {
                 continue;
             } else {
+                if (double_negate) {
+                    if (hp_lower_bound == hp) {
+                        ++hp_lower_bound;
+                    } else {
+                        if (hp_lower_bound == (hp-1)) {
+                            cuminative_str = cuminative_str + "&!HP" + hp_lower_bound;
+                            hp_lower_bound = hp+1;
+                        } else {
+                            cuminative_str = cuminative_str + "&!HP" + hp_lower_bound + "-" + (hp-1);
+                            hp_lower_bound = hp+1;
+                        }
+                    }
+                }
                 var lower_bound = -1;
                 var higher_bound = 10;
                 for (var cp = 10; cp < 5000; ++cp){                    
@@ -1817,11 +1843,19 @@
                     } else {
                         if (lower_bound > 0) {
                             if (lower_bound == higher_bound){
-                                output_str = output_str + "&!HP" + hp + ",";
-                                output_str = output_str + "!CP" + lower_bound;
+                                if (double_negate) {
+                                    output_str = output_str + "," + "CP" + lower_bound;
+                                } else {
+                                    output_str = output_str + "&!HP" + hp + ",";
+                                    output_str = output_str + "!CP" + lower_bound;
+                                }
                             } else {
-                                output_str = output_str + "&!HP" + hp + ",";
-                                output_str = output_str + "!CP" + lower_bound + "-" + higher_bound;
+                                if (double_negate) {
+                                    output_str = output_str + "," + "CP" + lower_bound + "-" + higher_bound;
+                                } else {
+                                    output_str = output_str + "&!HP" + hp + ",";
+                                    output_str = output_str + "!CP" + lower_bound + "-" + higher_bound;
+                                }
                             }
                             lower_bound = -1;
                         }
@@ -1829,11 +1863,19 @@
                 }
                 if (lower_bound > 0) {
                     if (lower_bound == higher_bound){
-                        output_str = output_str + "&!HP" + hp + ",";
-                        output_str = output_str + "!CP" + lower_bound;
+                        if (double_negate) {
+                            output_str = output_str + "," + "CP" + lower_bound;
+                        } else {
+                            output_str = output_str + "&!HP" + hp + ",";
+                            output_str = output_str + "!CP" + lower_bound;
+                        }
                     } else {
-                        output_str = output_str + "&!HP" + hp + ",";
-                        output_str = output_str + "!CP" + lower_bound + "-" + higher_bound;
+                        if (double_negate) {
+                            output_str = output_str + "," + "CP" + lower_bound + "-" + higher_bound;
+                        } else {
+                            output_str = output_str + "&!HP" + hp + ",";
+                            output_str = output_str + "!CP" + lower_bound + "-" + higher_bound;
+                        }
                     }
                     lower_bound = -1;
                 }
@@ -1845,15 +1887,26 @@
                     search_string.innerHTML = search_string.innerHTML + "<br/> <br/>"; 
                     search_string.innerHTML = search_string.innerHTML + dex_number;
                     hp_bound = hp-1;
-                    cuminative_str = output_str;
+                    if (double_negate) {
+                        cuminative_str = "&!HP" + hp + output_str;
+                    } else {
+                        cuminative_str = output_str;
+                    }
                 } else {
-                    cuminative_str = cuminative_str + output_str;
+                    if (double_negate) {
+                        cuminative_str = cuminative_str + "&!HP" + hp + output_str;
+                    } else {
+                        cuminative_str = cuminative_str + output_str;
+                    }
                 }
             }
         }
         if (hp_bound > 0) {
             search_string.innerHTML = search_string.innerHTML + "&!HP1-" + hp_bound;
         } 
+        if (double_negate) {
+            search_string.innerHTML = search_string.innerHTML + "&!HP" + hp_lower_bound + "-999";
+        }
         search_string.innerHTML = search_string.innerHTML + cuminative_str;
         search_string.innerHTML = search_string.innerHTML + "<br/> <br/>"; 
     }   
