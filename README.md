@@ -37,6 +37,8 @@ Do note that if you use this string you are gonna to mass transfer a lot pokemon
 
 Absolute version which is placed after fine version was actually inspire by inverted version. It's an extension of the idea of inverted string, which is, if we find the complement set of our target IVs and generate an inverted string of it, shouldn't we get the target IV instead? So this string is actually an implementation of this idea and it should do what it is supposed to. To 100% accurately translate all possible CP,HP combinations of your target IV to a search string. Because this method didn't involve any approximation, it's precision is as high as possible with the information we are allowed to use. So if you don't mind its length this will be the most recommended version of search string to be used.
 
+Now all different types of search strings are compatible with the new "stars" variable introduced.
+
 Recall from any of these sets of search strings is same as the recall of the "CP, HP and power up dust cost known" table, as search string was created by pulling data from this table directly. (Accuracy value shown in table is actually precision, not recall. Precision and recall is always on state of Pareto efficiency)
 
 In regard to the search function in app being able to accept long search string or not, the only information I have is the app do show some pokemons out with those long strings, but it is not known that if the result do contain all candidates as specified in the string.
