@@ -235,7 +235,8 @@
                     <option value="0">0-22/0%-48.9%</option>
                     <option value="1">23-29/51.1%-64.4%</option>
                     <option value="2">30-36/66.7%-80%</option>
-                    <option value="3">37-45/82.2%-100%</option>                 
+                    <option value="3">37-45/82.2%-97.8%</option>    
+                    <option value="4">45/100%</option>             
                 </select>
             </td>
         </tr>        
@@ -503,6 +504,9 @@
     
     var melmetal = 0;
     
+    var min_value = 0
+    var max_value = 45    
+    
     var fileInput = document.getElementById("csv"),
 
     readFile = function () {
@@ -586,6 +590,7 @@
         var pokemon_entry_no = parseInt(species.value);
         var go_base_stat = [parseInt(go_base_sta.value), parseInt(go_base_atk.value), parseInt(go_base_def.value)];
         //go_base_stat = go_msg_stat_conversion(pokemon_entry_no);
+        range_checks();
         var constrain_tensor = generate_constrain_matrix();  
         if (no_of_combination == 0) {
             alert("No target IV can be generated, please check if the IVs constrains are contradicting with each others.");
@@ -659,6 +664,127 @@
             return go_base_stat;
         }
     }
+    
+    function range_checks() {
+        var build_up_min = 0;
+        var build_up_max = 0;
+        var sum_bound = parseInt(sum_iv.value);
+        var atk_bound = parseInt(attack_iv.value);
+        if (atk_bound != -1) {
+            switch (attack_equality.value) {
+                case "0":
+                    build_up_min = build_up_min + atk_bound;
+                    build_up_max = build_up_max + 15;
+                    break;
+                case "1":
+                    build_up_min = build_up_min + atk_bound;
+                    build_up_max = build_up_max + atk_bound;
+                    break;
+                default:
+                    build_up_min = build_up_min + 0;
+                    build_up_max = build_up_max + atk_bound;
+                    break;                
+            }
+        } else {
+            build_up_min = build_up_min + 0;
+            build_up_max = build_up_max + 15;
+        }
+        var def_bound = parseInt(defense_iv.value);
+        if (def_bound != -1) {
+            switch (defense_equality.value) {
+                case "0":
+                    build_up_min = build_up_min + def_bound;
+                    build_up_max = build_up_max + 15;
+                    break;
+                case "1":
+                    build_up_min = build_up_min + def_bound;
+                    build_up_max = build_up_max + def_bound;
+                    break;
+                default:
+                    build_up_min = build_up_min + 0;
+                    build_up_max = build_up_max + def_bound;
+                    break;                
+            }
+        } else {
+            build_up_min = build_up_min + 0;
+            build_up_max = build_up_max + 15;
+        } 
+        var hp_bound = parseInt(hp_iv.value);
+        if (hp_bound != -1) {
+            switch (hp_equality.value) {
+                case "0":
+                    build_up_min = build_up_min + hp_bound;
+                    build_up_max = build_up_max + 15;
+                    break;
+                case "1":
+                    build_up_min = build_up_min + hp_bound;
+                    build_up_max = build_up_max + hp_bound;
+                    break;
+                default:
+                    build_up_min = build_up_min + 0;
+                    build_up_max = build_up_max + hp_bound;
+                    break;                
+            }
+        } else {
+            build_up_min = build_up_min + 0;
+            build_up_max = build_up_max + 15;
+        }   
+        if (sum_bound != -1) {
+            switch (sum_equality.value) {
+                case "0":
+                    if (build_up_min < sum_bound) {
+                        build_up_min = sum_bound;
+                    }
+                    break;
+                case "1":
+                    build_up_min = sum_bound;
+                    build_up_max = sum_bound;
+                default:
+                    if (build_up_max > sum_bound) {
+                        build_up_max = sum_bound;
+                    }
+                    break;                
+            }
+        } 
+        var appraisal_constrain = parseInt(appraisal_range.value);
+        switch (appraisal_constrain) {
+            case 0:
+                if (22 < build_up_max) {
+                    build_up_max = 22;
+                }
+                break;
+            case 1:
+                if (29 < build_up_max) {
+                    build_up_max = 29;
+                }
+                if (build_up_min < 23) {
+                    build_up_min = 23;
+                }                
+                break;
+            case 2:
+                if (36 < build_up_max) {
+                    build_up_max = 36;
+                }
+                if (build_up_min < 30) {
+                    build_up_min = 30;
+                }                 
+                break;
+            case 3:
+                if (44 < build_up_max) {
+                    build_up_max = 44;
+                }
+                if (build_up_min < 37) {
+                    build_up_min = 37;
+                }                 
+                break;
+            case 4:
+                build_up_max = 45;
+                build_up_min = 45;               
+                break;                
+        }
+        min_value = build_up_min;
+        max_value = build_up_max;                  
+    } 
     
     function generate_constrain_matrix() {
         var constrain_tensor = [];
@@ -776,12 +902,17 @@
                             }
                             break;
                         case 3:
-                            if (iv_total < 37) {
+                            if ((44 < iv_total)||(iv_total < 37)) {
                                 constrain_list[hp] = false;
                                 continue;
                             }
-                            break;                                                                           
-                    
+                            break;  
+                        case 4:
+                            if (iv_total < 45) {
+                                constrain_list[hp] = false;
+                                continue;
+                            }
+                            break;
                     }
                     constrain_list[hp] = true;
                     ++no_of_combination;                      
@@ -1639,9 +1770,43 @@
         return;
     }
     
-    function generate_search_string(data, search_string, fine, start_position) {
+    function generate_search_string(data, search_string, fine, start_position) {     
         var pokemon_entry_no = parseInt(species.value);
         var dex_number = pokedex[pokemon_entry_no];
+        if (min_value == 45) {
+            search_string.innerHTML = search_string.innerHTML + dex_number + "&4*<br/>";
+            return;
+        }
+        var stars_min = 0;
+        var stars_max = 4;
+        var star_string = "&";
+        if (23 > min_value) {
+            stars_min = 0;
+        } else if (44 < min_value) {
+            stars_min = 4;
+        } else if (36 < min_value) {
+            stars_min = 3;
+        } else if (29 < min_value) {
+            stars_min = 2;
+        } else if (22 < min_value) {
+            stars_min = 1;
+        }
+        if (23 > max_value) {
+            stars_max = 0;
+        } else if (44 < max_value) {
+            stars_max = 4;
+        } else if (36 < max_value) {
+            stars_max = 3;
+        } else if (29 < max_value) {
+            stars_max = 2;
+        } else if (22 < max_value) {
+            stars_max = 1;
+        }
+        if (stars_min == stars_max) {
+            star_string = star_string + stars_min + "*&";
+        } else {
+            star_string = star_string + stars_min + "*-" + stars_max + "*&";
+        }
         var candidate_cp = data;
         var hp_only = [];
         for (var count = 0; count < power_up_cost.length; ++count){
@@ -1712,7 +1877,7 @@
             if (all_checked) {
                 break;
             }
-            search_string.innerHTML = search_string.innerHTML + dex_number + "&";
+            search_string.innerHTML = search_string.innerHTML + dex_number +  star_string;
             var lower_bound = hp_candidate[0];
             var higher_bound = hp_candidate[0]; 
             for (var count = 1; count < hp_candidate.length; ++count){
@@ -1775,6 +1940,41 @@
         }
         var pokemon_entry_no = parseInt(species.value);
         var dex_number = pokedex[pokemon_entry_no];
+        if (min_value == 45) {
+            search_string.innerHTML = search_string.innerHTML + dex_number + "&4*<br/>";
+            return;
+        }
+        var stars_min = 0;
+        var stars_max = 4;
+        var star_string = "&";
+        if (23 > min_value) {
+            stars_min = 0;
+        } else if (44 < min_value) {
+            stars_min = 4;
+        } else if (36 < min_value) {
+            stars_min = 3;
+        } else if (29 < min_value) {
+            stars_min = 2;
+        } else if (22 < min_value) {
+            stars_min = 1;
+        }
+        if (23 > max_value) {
+            stars_max = 0;
+        } else if (44 < max_value) {
+            stars_max = 4;
+        } else if (36 < max_value) {
+            stars_max = 3;
+        } else if (29 < max_value) {
+            stars_max = 2;
+        } else if (22 < max_value) {
+            stars_max = 1;
+        }
+        if (stars_min == stars_max) {
+            star_string = star_string + stars_min + "*";
+        } else {
+            star_string = star_string + stars_min + "*-" + stars_max + "*";
+        }
+        var dex_number = pokedex[pokemon_entry_no];
         var candidate_cp = data;
         var hp_only = [];
         for (var count = 0; count < power_up_cost.length; ++count){
@@ -1809,7 +2009,7 @@
             }
         }       
 
-        search_string.innerHTML = search_string.innerHTML + dex_number;
+        search_string.innerHTML = search_string.innerHTML + dex_number + star_string;
         var cuminative_str = "";
         var hp_bound = -1;
         var hp_lower_bound = 1;
@@ -1885,7 +2085,7 @@
                     } 
                     search_string.innerHTML = search_string.innerHTML + "&!HP" + hp + "-999" + cuminative_str;
                     search_string.innerHTML = search_string.innerHTML + "<br/> <br/>"; 
-                    search_string.innerHTML = search_string.innerHTML + dex_number;
+                    search_string.innerHTML = search_string.innerHTML + dex_number + star_string;
                     hp_bound = hp-1;
                     if (double_negate) {
                         cuminative_str = "&!HP" + hp + output_str;
